@@ -63,6 +63,7 @@ const config: Config = {
 	// 		// 如果有套用不了的屬性，可以在這裡新增設定
 	// 	}
 	// },
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   plugins: [require("tailwindcss-animate")],
 };
 export default config;
