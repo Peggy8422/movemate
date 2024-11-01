@@ -50,38 +50,40 @@ const SignUpForm = () => {
         註冊會員
       </h1>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="lastname"
-          render={({ field }) => (
-            <FormItem className="mb-3">
-              <FormLabel>姓氏</FormLabel>
-              <FormControl>
-                <Input placeholder="（ex: 王）" {...field} />
-              </FormControl>
-              {/* <FormDescription>
+        <div className="flex gap-2">
+          <FormField
+            control={form.control}
+            name="lastname"
+            render={({ field }) => (
+              <FormItem className="mb-3 flex-grow">
+                <FormLabel>姓氏</FormLabel>
+                <FormControl>
+                  <Input placeholder="（ex: 王）" {...field} />
+                </FormControl>
+                {/* <FormDescription>
               使用者姓氏必須介於 1 到 50 個字之間
             </FormDescription> */}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="firstname"
-          render={({ field }) => (
-            <FormItem className="mb-3">
-              <FormLabel>名字</FormLabel>
-              <FormControl>
-                <Input placeholder="（ex: 小明）" {...field} />
-              </FormControl>
-              {/* <FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="firstname"
+            render={({ field }) => (
+              <FormItem className="mb-3 flex-grow">
+                <FormLabel>名字</FormLabel>
+                <FormControl>
+                  <Input placeholder="（ex: 小明）" {...field} />
+                </FormControl>
+                {/* <FormDescription>
               使用者名字必須介於 1 到 50 個字之間
             </FormDescription> */}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <FormField
           control={form.control}
           name="account"
@@ -142,11 +144,16 @@ const SignUpForm = () => {
             </FormItem>
           )}
         />
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 mt-10">
           <Button type="submit" size="sm" className="w-1/4 min-w-[150px]">
             註冊
           </Button>
-          <Button size="sm" asChild variant="outline" className="w-1/4 min-w-[150px]">
+          <Button
+            size="sm"
+            asChild
+            variant="outline"
+            className="w-1/4 min-w-[150px]"
+          >
             <Link href="/sign-in">以其他方式登入</Link>
           </Button>
         </div>

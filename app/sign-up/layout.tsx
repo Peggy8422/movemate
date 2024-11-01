@@ -11,7 +11,7 @@ export default function SignUpLayout({
         <BrandLogo fill="#001f54" width={50} height={50} className="mr-4" />
         <h1 className="font-baloo text-3xl font-bold text-primary">MoveMate</h1>
       </div>
-      <div className="w-1/2 mx-auto mt-20 max-w-[600px]">{children}</div>
+      <div className="w-1/2 mx-auto mt-16 max-w-[600px]">{children}</div>
     </main>
   );
 }
