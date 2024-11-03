@@ -6,6 +6,7 @@
 
 body {
   font-family: Noto Sans, Arial, Helvetica, sans-serif;
+  /* color: hsl(from color h s l) */
 }
 
 @layer utilities {
