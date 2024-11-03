@@ -21,8 +21,8 @@ import { useForm } from "react-hook-form";
 const formSchema = z
   .object({
     lastname: z.string().min(1).max(50),
-    firstname: z.string().min(1).max(50),
-    account: z.string().min(1).max(50),
+    firstname: z.string().email(),
+    account: z.string().min(1).max(50), //email
     password: z.string().min(6).max(12),
     checkedPassword: z.string().min(6).max(12),
   })
