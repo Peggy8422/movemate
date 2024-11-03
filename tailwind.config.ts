@@ -58,7 +58,7 @@ const config: Config = {
       },
       fontFamily: {
         baloo: ['"Baloo 2"', "sans-serif"],
-		notoSans: ['"Noto Sans"', "serif"],
+        notoSans: ['"Noto Sans"', "serif"],
       },
     },
   },
