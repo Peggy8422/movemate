@@ -87,7 +87,7 @@ const SignIn = () => {
         >
           <Card className="w-full">
             <CardHeader className="py-3 px-0">
-              <TabsList className="grid w-full grid-cols-2 p-0">
+              <TabsList className="grid w-full grid-cols-2 p-0 bg-transparent">
                 <TabsTrigger
                   value="signin"
                   className="rounded-none text-secondary text-base border-b-2 border-b-secondary data-[state=active]:text-primary data-[state=active]:border-b-primary"
@@ -122,7 +122,7 @@ const SignIn = () => {
                           <FormLabel className="text-primary">帳戶</FormLabel>
                           <FormControl>
                             <Input
-                              className="border-b-1 border-b-primary rounded-none focus-visible:ring-0"
+                              className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
                               type="email"
                               placeholder="請輸入註冊時的帳戶(電子信箱)"
                               {...field}
@@ -140,7 +140,7 @@ const SignIn = () => {
                           <FormLabel className="text-primary">密碼</FormLabel>
                           <FormControl>
                             <Input
-                              className="border-b-1 border-b-primary rounded-none focus-visible:ring-0"
+                              className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
                               type="password"
                               placeholder="請輸入註冊時的密碼"
                               {...field}
