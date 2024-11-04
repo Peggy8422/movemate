@@ -27,20 +27,21 @@ import { useTheme } from "next-themes";
 
 const NavHeader = () => {
   const { theme, setTheme } = useTheme();
-  const systemTheme = localStorage.getItem("theme");
+
   return (
     <div className="brand-header w-full px-8 py-4 flex items-center justify-between position-fixed top-0 left-0 shadow-md">
       <div className="flex items-center">
-        <BrandLogo fill={theme === "dark" || systemTheme === "dark" ? "#fff" : "#001f54"} width={50} height={50} className="mr-4" />
+        <BrandLogo
+          fill="hsl(var(--primary))"
+          width={50}
+          height={50}
+          className="mr-4"
+        />
         <h1 className="font-baloo text-3xl font-bold text-primary">MoveMate</h1>
       </div>
       {/* avatar + dropdown menu */}
       <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="icon"
-          className="text-primary"
-        >
+        <Button variant="outline" size="icon" className="text-primary">
           <FontAwesomeIcon icon={faBell} />
         </Button>
         <DropdownMenu>
