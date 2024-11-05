@@ -25,9 +25,9 @@ export default function RootLayout({
           <main className="bg-gradient-to-b from-neutral-50 dark:from-neutral-900 to-secondary">
             {/* nav-header */}
             <NavHeader />
-            <div className="w-10/12 sm:w-1/2 mx-auto mt-16 max-w-[600px]">
+            {/* <div> */}
               {children}
-            </div>
+            {/* </div> */}
           </main>
         </ThemeProvider>
       </body>
