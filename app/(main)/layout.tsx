@@ -22,7 +22,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="bg-gradient-to-b from-neutral-50 dark:from-neutral-900 to-secondary">
+          <main className="bg-gradient-to-b from-neutral-50 dark:from-neutral-900 to-secondary relative">
             {/* nav-header */}
             <NavHeader />
             {/* <div> */}

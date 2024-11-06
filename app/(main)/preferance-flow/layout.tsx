@@ -4,9 +4,9 @@ export default function PreferanceFlowLayout({
     children: React.ReactNode;
   }) {
     return (
-      <main className="flex h-screen flex-col">
+      <div className="flex h-screen flex-col">
         {children}
-      </main>
+      </div>
     );
   }
   

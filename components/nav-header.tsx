@@ -29,7 +29,7 @@ const NavHeader = () => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="brand-header w-full px-8 py-4 flex items-center justify-between position-fixed top-0 left-0 shadow-md">
+    <div className="brand-header w-full px-8 py-4 flex items-center justify-between fixed top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900">
       <div className="flex items-center">
         <BrandLogo
           fill="hsl(var(--primary))"
