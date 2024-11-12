@@ -33,10 +33,10 @@ import { useForm } from "react-hook-form";
 
 const formSchema = z
   .object({
-    height: z.number().min(1),
-    weight: z.number().min(1),
+    height: z.number().min(1).int().nullable(),
+    weight: z.number().min(1).int().nullable(),
     sexual: z.string(),
-    age: z.number().min(18),
+    age: z.number().min(18).int().nullable(),
     // live place
     city: z.string(),
     district: z.string(),
@@ -44,21 +44,15 @@ const formSchema = z
     place: z.string(),
     sportType: z
       .array(z.string())
-      .refine((value) => value.some((item) => item), {
-        message: "請選擇至少一個選項",
-      })
-      .refine((value) => value.length <= 3, {
-        message: "至多選擇三個選項",
-      }),
+      .nonempty({ message: "請選擇至少一個選項" })
+      .max(3, { message: "至多選擇三個選項" })
+      .nullable(),
     frequency: z.string(),
     purpose: z
       .array(z.string())
-      .refine((value) => value.some((item) => item), {
-        message: "請選擇至少一個選項",
-      })
-      .refine((value) => value.length <= 3, {
-        message: "至多選擇三個選項",
-      }),
+      .nonempty({ message: "請選擇至少一個選項" })
+      .max(3, { message: "至多選擇三個選項" })
+      .nullable(),
   })
   .required();
 
@@ -121,25 +115,25 @@ const PreferanceFlow = () => {
   const [currentStep, setCurrentStep] = useState(1);
 
   const form = useForm<z.infer<typeof formSchema>>({
-    reValidateMode: "onSubmit",
-    shouldUnregister: true,
+    mode: "onChange",
+    // shouldUnregister: true,
     resolver: zodResolver(formSchema),
     defaultValues: {
-      height: undefined,
-      weight: undefined,
+      height: null,
+      weight: null,
       sexual: "male", // boy: 1, girl: 2
-      age: undefined,
+      age: null,
       city: "",
       district: "",
       road: "",
       place: "",
-      sportType: [""],
+      sportType: null,
       frequency: "",
-      purpose: [""],
+      purpose: null,
     },
   });
 
-  // console.log(form);
+  console.log(form);
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     // sent to backend
@@ -183,6 +177,13 @@ const PreferanceFlow = () => {
                           min={1}
                           placeholder="請輸入身高"
                           {...field}
+                          value={
+                            field.value !== null ? String(field.value) : ""
+                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.onChange(value ? Number(value) : null);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -205,6 +206,13 @@ const PreferanceFlow = () => {
                           min={1}
                           placeholder="請輸入體重"
                           {...field}
+                          value={
+                            field.value !== null ? String(field.value) : ""
+                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.onChange(value ? Number(value) : null);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -257,6 +265,13 @@ const PreferanceFlow = () => {
                           min={18}
                           placeholder="請輸入年齡"
                           {...field}
+                          value={
+                            field.value !== null ? String(field.value) : ""
+                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.onChange(value ? Number(value) : null);
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -418,7 +433,11 @@ const PreferanceFlow = () => {
                           checked={field.value?.includes(option.value)}
                           onCheckedChange={(checked) => {
                             return checked
-                              ? field.onChange([...field.value, option.value])
+                              ? field.onChange(
+                                  field.value !== null
+                                    ? [...field.value, option.value]
+                                    : [option.value]
+                                )
                               : field.onChange(
                                   field.value?.filter(
                                     (value) => value !== option.value
@@ -491,7 +510,11 @@ const PreferanceFlow = () => {
                           checked={field.value?.includes(option.value)}
                           onCheckedChange={(checked) => {
                             return checked
-                              ? field.onChange([...field.value, option.value])
+                              ? field.onChange(
+                                  field.value !== null
+                                    ? [...field.value, option.value]
+                                    : [option.value]
+                                )
                               : field.onChange(
                                   field.value?.filter(
                                     (value) => value !== option.value
@@ -530,9 +553,12 @@ const PreferanceFlow = () => {
             {currentStep === 6 && (
               <Button
                 type="submit"
-                disabled={Object.values(form.control._formValues).some(
-                  (value) => !value
-                )}
+                disabled={
+                  !form.formState.isValid ||
+                  Object.values(form.control._formValues).some(
+                    (value) => !value
+                  )
+                }
               >
                 完成
               </Button>
