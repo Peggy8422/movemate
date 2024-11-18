@@ -22,6 +22,8 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 
 import { useTheme } from "next-themes";
 
@@ -29,8 +31,12 @@ const NavHeader = () => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="brand-header w-full px-8 py-4 flex items-center justify-between fixed top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900">
+    <div className="brand-header w-full pr-8 pl-3 py-4 flex items-center justify-between absolute top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900">
       <div className="flex items-center">
+        <SidebarTrigger className="text-primary" />
+        <div className="h-[30px]">
+          <Separator orientation="vertical" className="mx-3" />
+        </div>
         <BrandLogo
           fill="hsl(var(--primary))"
           width={50}
