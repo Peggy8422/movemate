@@ -4,9 +4,9 @@ export default function PreferanceFlowLayout({
     children: React.ReactNode;
   }) {
     return (
-      <main className="bg-gradient-to-br from-neutral-50 to-neutral-800 flex h-screen flex-col">
+      <div className="flex h-screen flex-col">
         {children}
-      </main>
+      </div>
     );
   }
   

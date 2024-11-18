@@ -60,6 +60,12 @@ const SignIn = () => {
     console.log(data);
   };
 
+  // 記錄一下是否為第一次登入 -> 都先導去首頁，後端回傳資料後再做判斷
+  // 是：導向 /preferance-flow
+  // 否：導向 /home
+  
+  const lineLoginApi = `${process.env.NEXT_PUBLIC_LINE_LOGIN_URI}${process.env.NEXT_PUBLIC_LINE_LOGIN_REDIRECT_URI}`;
+
   return (
     <div className="flex h-full position-relative max-w-[1440px] mx-auto">
       <div className="w-full sm:w-1/2 flex flex-col items-center sm:items-start justify-center px-10 h-full">
@@ -192,9 +198,12 @@ const SignIn = () => {
             <FacebookLogo width={30} height={30} className="w-6 h-6" />以
             Facebook 帳號登入
           </Button>
-          <Button>
-            <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
-            帳號登入
+          <Button asChild>
+            {/* link */}
+            <Link href={lineLoginApi}>
+              <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
+              帳號登入
+            </Link>
           </Button>
         </div>
       </div>

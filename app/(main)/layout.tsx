@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import BrandLogo from "@/public/movemate_logo.svg";
+import { ThemeProvider } from "@/components/next-theme-provider";
+import  NavHeader  from "@/components/nav-header";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,19 +16,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`antialiased`}>
-        <main className="bg-gradient-to-b from-neutral-50 to-secondary">
-          {/* navbar */}
-          <div className="brand-header w-full px-8 py-4 flex items-center gap-2 position-fixed top-0 left-0 shadow-md">
-            <BrandLogo fill="#001f54" width={50} height={50} className="mr-4" />
-            <h1 className="font-baloo text-3xl font-bold text-primary">
-              MoveMate
-            </h1>
-            {/* avatar */}
-          </div>
-          <div className="w-10/12 sm:w-1/2 mx-auto mt-16 max-w-[600px]">
-            {children}
-          </div>
-        </main>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <main className="bg-gradient-to-b from-neutral-50 dark:from-neutral-900 to-secondary relative">
+            {/* nav-header */}
+            <NavHeader />
+            {/* <div> */}
+              {children}
+            {/* </div> */}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );
