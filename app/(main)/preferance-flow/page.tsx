@@ -378,7 +378,7 @@ const PreferanceFlow = () => {
                       <FormControl>
                         <Checkbox
                           checked={field.value?.includes(option.value)}
-                          onCheckedChange={(checked) => {
+                          onCheckedChange={(checked: boolean) => {
                             return checked
                               ? field.onChange(
                                   field.value !== null
@@ -455,7 +455,7 @@ const PreferanceFlow = () => {
                       <FormControl>
                         <Checkbox
                           checked={field.value?.includes(option.value)}
-                          onCheckedChange={(checked) => {
+                          onCheckedChange={(checked: boolean) => {
                             return checked
                               ? field.onChange(
                                   field.value !== null
