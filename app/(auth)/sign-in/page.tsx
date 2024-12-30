@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +10,16 @@ import FacebookLogo from "@/public/facebook_logo.svg";
 import LineLogo from "@/public/line_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
+
+// import { config } from "@/auth";
+
+// import { signIn } from "next-auth/react";
+// import { useSession } from "next-auth/react";
+// import type {
+//   GetServerSidePropsContext,
+//   InferGetServerSidePropsType,
+// } from "next";
+// import { GET, POST } from "@/app/api/auth/[...nextauth]/route";
 
 // shadcn/ui
 import { Button } from "@/components/ui/button";
@@ -44,9 +54,10 @@ const formSchema = z
   })
   .required();
 
-const SignIn = () => {
-  const [tab, setTab] = useState("signin");
+// const providers = config.providers;
 
+const SignIn = () => {
+  // const { data: session, status } = useSession();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -63,8 +74,16 @@ const SignIn = () => {
   // 記錄一下是否為第一次登入 -> 都先導去首頁，後端回傳資料後再做判斷
   // 是：導向 /preferance-flow
   // 否：導向 /home
-  
-  const lineLoginApi = `${process.env.NEXT_PUBLIC_LINE_LOGIN_URI}${process.env.NEXT_PUBLIC_LINE_LOGIN_REDIRECT_URI}`;
+
+  const handleGoogleLogin = () => {};
+  const handleFacebookLogin = () => {};
+  const handleLineLogin = () => {};
+
+  // const lineLoginApi = `${process.env.NEXT_PUBLIC_LINE_LOGIN_URI}${process.env.NEXT_PUBLIC_DEV_BASE_URL}`;
+
+  // if (status === "authenticated") {
+  //   console.log(session);
+  // }
 
   return (
     <div className="flex h-full position-relative max-w-[1440px] mx-auto">
@@ -85,10 +104,11 @@ const SignIn = () => {
         </p>
         {/* card with tabs for sign in */}
         <Tabs
-          value={tab}
-          onValueChange={(value) => {
-            setTab(value);
-          }}
+          defaultValue="signin"
+          // value={tab}
+          // onValueChange={(value) => {
+          //   setTab(value);
+          // }}
           className="w-full max-w-[600px]"
         >
           <Card className="w-full">
@@ -190,20 +210,29 @@ const SignIn = () => {
         </Tabs>
         {/* buttons for social media logins */}
         <div className="flex flex-col gap-4 mt-6 w-full md:w-1/2 min-w-[250px]">
-          <Button>
+          <Button onClick={handleGoogleLogin}>
             <GoogleLogo width={30} height={30} className="w-6 h-6" />以 Google
             帳號登入
           </Button>
-          <Button>
+          <Button onClick={handleFacebookLogin}>
             <FacebookLogo width={30} height={30} className="w-6 h-6" />以
             Facebook 帳號登入
           </Button>
-          <Button asChild>
-            {/* link */}
-            <Link href={lineLoginApi}>
-              <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
-              帳號登入
-            </Link>
+          {/* {providers.map((provider) => (
+            <Button
+              key={provider.id}
+              onClick={() => signIn(provider.id, { callbackUrl: "/" })}
+            >
+              {provider.id === "line" && (
+                <LineLogo width={30} height={30} className="w-6 h-6" />
+              )}
+              以 {provider.name} 帳號登入
+            </Button>
+          ))} */}
+
+          <Button onClick={handleLineLogin}>
+            <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
+            帳號登入
           </Button>
         </div>
       </div>
@@ -224,3 +253,11 @@ const SignIn = () => {
 };
 
 export default SignIn;
+
+// Note:
+// In contrast to useSession, which will return a session object whether or not a user has logged in (whether or not cookies are present), getServerSession only returns a session object when a user has logged in (only when authenticated cookies are present), otherwise, it returns null.
+// data: This can be three values: Session / undefined / null.
+//  - when the session hasn't been fetched yet, data will be undefined
+//  - in case it failed to retrieve the session, data will be null
+//  - in case of success, data will be Session.
+// status: enum mapping to three possible session states: "loading" | "authenticated" | "unauthenticated"
