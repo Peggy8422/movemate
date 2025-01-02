@@ -35,7 +35,7 @@ const CommunityListItem = ({
             <AvatarImage src={avatarSrc} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <div className="text-sm md:text-md font-bold text-neutral-800 mt-2 max-w-full whitespace-nowrap overflow-hidden overflow-ellipsis">
+          <div className="text-sm md:text-md font-bold text-neutral-800 dark:text-neutral-200 mt-2 max-w-full whitespace-nowrap overflow-hidden overflow-ellipsis">
             {name}
           </div>
         </HoverCardTrigger>

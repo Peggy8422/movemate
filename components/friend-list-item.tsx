@@ -19,9 +19,9 @@ const FriendListItem = ({
   isOnline: boolean;
 }) => {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 cursor-pointer">
       <div className="relative">
-        <Avatar className="cursor-pointer h-14 w-14">
+        <Avatar className="h-14 w-14">
           <AvatarImage src={avatarSrc} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
@@ -33,7 +33,7 @@ const FriendListItem = ({
         ></div>
       </div>
       <div>
-        <div className="text-md md:text-lg font-bold text-neutral-800">
+        <div className="text-md md:text-lg font-bold text-neutral-800 dark:text-neutral-200">
           {name}
         </div>
         <div className="text-sm text-primary">

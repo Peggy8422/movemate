@@ -148,7 +148,7 @@ export default function RootLayout({
                     />
                   </div>
                 </div>
-                <div className="h-1/2">
+                <div className="h-[calc(50%-35px)]">
                   <Separator className="my-3" />
                   <h3 className="text-primary font-semibold mb-3">你的社群</h3>
                   <div className="flex flex-wrap pb-2 h-[calc(100%-2rem)] overflow-scroll">
@@ -225,6 +225,11 @@ export default function RootLayout({
                       membersNum={11}
                     />
                   </div>
+                </div>
+                <div className="h-[35px] pl-6 pr-3 bg-background absolute bottom-0 left-0 right-0 flex items-center gap-3">
+                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                  <h6> 聊天室 </h6>
+                  <span className="active_room_num inline-block p-1 px-2 rounded-sm bg-neutral-300 dark:bg-neutral-500 text-neutral-800 dark:text-neutral-200 font-medium text-xs">2</span>
                 </div>
               </div>
               {/* small screen (mobile) */}
