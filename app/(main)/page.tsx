@@ -1,9 +1,8 @@
 // "use client";
 
 import React from "react";
-import { redirect } from 'next/navigation'
+// import { redirect } from "next/navigation";
 // import { useSearchParams } from "next/navigation";
-
 
 export default function Home() {
   // const searchParams = useSearchParams();
@@ -17,7 +16,7 @@ export default function Home() {
   // }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
+    <div className="flex items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 md:w-[calc(80%-50px)]">
       test homepage
     </div>
   );
