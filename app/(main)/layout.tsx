@@ -207,7 +207,7 @@ export default function RootLayout({
                     />
                   </div>
                 </div>
-                <div className="h-[35px] pl-6 pr-3 bg-background absolute bottom-0 left-0 right-0 flex items-center gap-3">
+                <div className="h-[35px] pl-6 pr-3 bg-background absolute bottom-0 left-0 right-0 flex items-center gap-3 cursor-pointer">
                   <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
                   <h6> 聊天室 </h6>
                   <span className="active_room_num inline-block p-1 px-2 rounded-sm bg-neutral-300 dark:bg-neutral-500 text-neutral-800 dark:text-neutral-200 font-medium text-xs">2</span>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +10,16 @@ import FacebookLogo from "@/public/facebook_logo.svg";
 import LineLogo from "@/public/line_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
+
+// import { config } from "@/auth";
+
+// import { signIn } from "next-auth/react";
+// import { useSession } from "next-auth/react";
+// import type {
+//   GetServerSidePropsContext,
+//   InferGetServerSidePropsType,
+// } from "next";
+// import { GET, POST } from "@/app/api/auth/[...nextauth]/route";
 
 // shadcn/ui
 import { Button } from "@/components/ui/button";
@@ -44,9 +54,10 @@ const formSchema = z
   })
   .required();
 
-const SignIn = () => {
-  const [tab, setTab] = useState("signin");
+// const providers = config.providers;
 
+const SignIn = () => {
+  // const { data: session, status } = useSession();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -94,10 +105,11 @@ const SignIn = () => {
         </p>
         {/* card with tabs for sign in */}
         <Tabs
-          value={tab}
-          onValueChange={(value) => {
-            setTab(value);
-          }}
+          defaultValue="signin"
+          // value={tab}
+          // onValueChange={(value) => {
+          //   setTab(value);
+          // }}
           className="w-full max-w-[600px]"
         >
           <Card className="w-full">
@@ -265,3 +277,11 @@ const SignIn = () => {
 };
 
 export default SignIn;
+
+// Note:
+// In contrast to useSession, which will return a session object whether or not a user has logged in (whether or not cookies are present), getServerSession only returns a session object when a user has logged in (only when authenticated cookies are present), otherwise, it returns null.
+// data: This can be three values: Session / undefined / null.
+//  - when the session hasn't been fetched yet, data will be undefined
+//  - in case it failed to retrieve the session, data will be null
+//  - in case of success, data will be Session.
+// status: enum mapping to three possible session states: "loading" | "authenticated" | "unauthenticated"
