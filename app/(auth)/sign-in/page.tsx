@@ -63,8 +63,17 @@ const SignIn = () => {
   // 記錄一下是否為第一次登入 -> 都先導去首頁，後端回傳資料後再做判斷
   // 是：導向 /preferance-flow
   // 否：導向 /home
-  
-  const lineLoginApi = `${process.env.NEXT_PUBLIC_LINE_LOGIN_URI}${process.env.NEXT_PUBLIC_LINE_LOGIN_REDIRECT_URI}`;
+
+  // TODO : 1/19 做完第三方登入功能
+  const handleGoogleLogin = async () => {};
+  const handleFacebookLogin = () => {};
+  const handleLineLogin = () => {};
+
+  // const lineLoginApi = `${process.env.NEXT_PUBLIC_LINE_LOGIN_URI}${process.env.NEXT_PUBLIC_DEV_BASE_URL}`;
+
+  // if (status === "authenticated") {
+  //   console.log(session);
+  // }
 
   return (
     <div className="flex h-full position-relative max-w-[1440px] mx-auto">
@@ -190,21 +199,53 @@ const SignIn = () => {
         </Tabs>
         {/* buttons for social media logins */}
         <div className="flex flex-col gap-4 mt-6 w-full md:w-1/2 min-w-[250px]">
-          <Button>
+          {/* <Button onClick={handleGoogleLogin}>
             <GoogleLogo width={30} height={30} className="w-6 h-6" />以 Google
             帳號登入
-          </Button>
-          <Button>
+          </Button> */}
+          {/* <Button onClick={handleFacebookLogin}>
             <FacebookLogo width={30} height={30} className="w-6 h-6" />以
             Facebook 帳號登入
+          </Button> */}
+          {/* <Button onClick={handleLineLogin}>
+            <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
+            帳號登入
+          </Button> */}
+          <Button asChild>
+            <Link
+              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
+            >
+              <GoogleLogo width={30} height={30} className="w-6 h-6" />以 Google
+              帳號登入
+            </Link>
           </Button>
           <Button asChild>
-            {/* link */}
-            <Link href={lineLoginApi}>
+            <Link
+              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
+            >
+              <FacebookLogo width={30} height={30} className="w-6 h-6" />以
+              FaceBook 帳號登入
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link
+              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/line`}
+            >
               <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
               帳號登入
             </Link>
           </Button>
+          {/* {providers.map((provider) => (
+            <Button
+              key={provider.id}
+              onClick={() => signIn(provider.id, { callbackUrl: "/" })}
+            >
+              {provider.id === "line" && (
+                <LineLogo width={30} height={30} className="w-6 h-6" />
+              )}
+              以 {provider.name} 帳號登入
+            </Button>
+          ))} */}
         </div>
       </div>
       <div className="sm:w-1/2 flex justify-end position-relative">

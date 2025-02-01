@@ -26,18 +26,24 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 // import { cn } from "@/lib/utils";
 
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 
 const NavHeader = () => {
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
 
   return (
     <div className="brand-header w-full pr-8 pl-3 py-4 flex items-center justify-between absolute top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900 z-50">
       <div className="flex items-center">
-        <SidebarTrigger className="text-primary" />
-        <div className="h-[30px]">
-          <Separator orientation="vertical" className="mx-3" />
-        </div>
+        {pathname !== "/preferance-flow" && (
+          <SidebarTrigger className="text-primary" />
+        )}
+        {pathname !== "/preferance-flow" && (
+          <div className="h-[30px]">
+            <Separator orientation="vertical" className="mx-3" />
+          </div>
+        )}
         <BrandLogo
           fill="hsl(var(--primary))"
           width={50}
@@ -69,7 +75,9 @@ const NavHeader = () => {
             <DropdownMenuLabel>我的帳戶</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>個人頁面設定</DropdownMenuItem>
+              <DropdownMenuItem disabled={pathname === "/preferance-flow"}>
+                個人頁面設定
+              </DropdownMenuItem>
               <DropdownMenuItem>登出</DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSub>
