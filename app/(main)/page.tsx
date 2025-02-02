@@ -1,19 +1,15 @@
-// "use client";
-
 import React from "react";
-// import { redirect } from "next/navigation";
-// import { useSearchParams } from "next/navigation";
+import { cookies } from 'next/headers'
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  // const searchParams = useSearchParams();
-  // const code = searchParams.get("code");
+  const token = cookies().get("token");
+  if (!token) {
+    redirect("/sign-in");
+  } else {
+    console.log(token);
+  }
 
-  // console.log(code);
-  // const token = localStorage.getItem("token");
-
-  // if (!token) {
-  //   redirect("/sign-in")
-  // }
 
   return (
     <div className="flex items-center justify-center min-h-screen p-8 pb-20 gap-16 sm:p-20 md:w-[calc(80%-50px)]">

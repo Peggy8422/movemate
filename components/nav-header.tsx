@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import BrandLogo from "@/public/movemate_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
@@ -26,12 +26,42 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 // import { cn } from "@/lib/utils";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
+import { getCookie, deleteCookie } from "@/app/actions";
+
+interface User {
+  id?: string;
+  name: string;
+  email: string;
+  googleId?: string;
+  facebookId?: string;
+  lineId?: string;
+  coverPhoto: string;
+  isFilledOutDoc: boolean;
+  iat: number;
+  exp: number;
+}
+
 
 const NavHeader = () => {
+  
+  
+  const [user, setUser] = useState<User | null>(null);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
+  const router = useRouter();
+
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await getCookie("user");
+      if (userData) {
+        setUser(JSON.parse(userData.value));
+      }
+    };
+    fetchUserData();
+  }, []);
 
   return (
     <div className="brand-header w-full pr-8 pl-3 py-4 flex items-center justify-between absolute top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900 z-50">
@@ -64,9 +94,9 @@ const NavHeader = () => {
             <div className="relative">
               <Avatar className="cursor-pointer border-2 border-secondary">
                 {/* fetch avatar */}
-                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarImage src={user?.coverPhoto} />
                 {/* Fallback: username */}
-                <AvatarFallback>UN</AvatarFallback>
+                <AvatarFallback>{user?.name}</AvatarFallback>
               </Avatar>
               <div className="absolute right-0 bottom-0 h-2 w-2 bg-green-500 rounded-full"></div>
             </div>
@@ -78,7 +108,15 @@ const NavHeader = () => {
               <DropdownMenuItem disabled={pathname === "/preferance-flow"}>
                 個人頁面設定
               </DropdownMenuItem>
-              <DropdownMenuItem>登出</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  await deleteCookie("token");
+                  await deleteCookie("user");
+                  router.push("/sign-in");
+                }}
+              >
+                登出
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>主題色</DropdownMenuSubTrigger>

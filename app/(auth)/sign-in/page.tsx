@@ -76,9 +76,9 @@ const SignIn = () => {
   // 否：導向 /home
 
   // TODO : 1/19 做完第三方登入功能
-  const handleGoogleLogin = async () => {};
-  const handleFacebookLogin = () => {};
-  const handleLineLogin = () => {};
+  // const handleGoogleLogin = async () => {};
+  // const handleFacebookLogin = () => {};
+  // const handleLineLogin = () => {};
 
   // const lineLoginApi = `${process.env.NEXT_PUBLIC_LINE_LOGIN_URI}${process.env.NEXT_PUBLIC_DEV_BASE_URL}`;
 

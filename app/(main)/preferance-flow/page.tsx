@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -27,7 +28,13 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 // import Link from "next/link";
 
-import { placeOptions, sportTypeOptions, purposeOptions, frequencyOptions } from "@/consts/preferance-flow-options";
+import {
+  placeOptions,
+  sportTypeOptions,
+  purposeOptions,
+  frequencyOptions,
+} from "@/consts/preferance-flow-options";
+import { getCookie } from "@/app/actions";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -60,6 +67,18 @@ const formSchema = z
 
 const PreferanceFlow = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const router = useRouter();
+
+  useEffect(() => {
+    const getToken = async () => {
+      const token = await getCookie("token");
+      if (!token) {
+        router.push("/sign-in");
+      }
+    };
+
+    getToken();
+  }, [router]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     mode: "onChange",

@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { jwtDecode, JwtPayload } from "jwt-decode";
+import { setCookie } from "@/app/actions";
 
 interface CustomJwtPayload extends JwtPayload {
   id: string;
@@ -24,13 +25,26 @@ export default function LoginRedirect() {
 
   if (token) {
     const decodedToken = jwtDecode<CustomJwtPayload>(token);
-    console.log(decodedToken);
     if (!decodedToken.isFilledOutDoc) {
       router.push("/preferance-flow");
     } else {
       router.push("/");
     }
   }
+
+  useEffect(() => {
+    if (!token) {
+      router.push("/sign-in");
+    } else {
+      const setUserData = async () => {
+        await setCookie("token", token);
+        const decodedToken = jwtDecode<CustomJwtPayload>(token);
+        await setCookie("user", JSON.stringify(decodedToken));
+      };
+
+      setUserData();
+    }
+  }, [router, token]);
 
   return (
     <div className="flex items-center justify-center gap-4">
