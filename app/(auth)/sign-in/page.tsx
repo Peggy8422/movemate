@@ -262,9 +262,11 @@ const SignIn = () => {
                         size="sm"
                         className="w-1/3"
                         disabled={
+                          !form.formState.isValid ||
                           !form.getValues("account") ||
                           !form.getValues("password")
                         }
+                        type="submit"
                       >
                         登入
                       </Button>
@@ -310,14 +312,6 @@ const SignIn = () => {
             <Link href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}>
               <GoogleLogo width={30} height={30} className="w-6 h-6" />以 Google
               帳號登入
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/facebook`}
-            >
-              <FacebookLogo width={30} height={30} className="w-6 h-6" />以
-              FaceBook 帳號登入
             </Link>
           </Button>
           <Button asChild>
