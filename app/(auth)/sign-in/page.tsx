@@ -21,6 +21,8 @@ import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
 // } from "next";
 // import { GET, POST } from "@/app/api/auth/[...nextauth]/route";
 
+import { forgetPassword } from "@/app/actions";
+
 // shadcn/ui
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +44,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  AlertDialog,
+  // AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -51,6 +64,12 @@ const formSchema = z
   .object({
     account: z.string().email(),
     password: z.string().min(6).max(12),
+  })
+  .required();
+
+const resetPasswordSchema = z
+  .object({
+    account: z.string().email(),
   })
   .required();
 
@@ -66,6 +85,14 @@ const SignIn = () => {
     },
   });
 
+  const resetPasswordForm = useForm<z.infer<typeof resetPasswordSchema>>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      account: "",
+    },
+  });
+
+  // login
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     // sent to backend
     console.log(data);
@@ -79,6 +106,10 @@ const SignIn = () => {
   // const handleGoogleLogin = async () => {};
   // const handleFacebookLogin = () => {};
   // const handleLineLogin = () => {};
+
+  const handleForgetPasswordPost = async () => {
+    await forgetPassword(resetPasswordForm.getValues("account"));
+  };
 
   // const lineLoginApi = `${process.env.NEXT_PUBLIC_LINE_LOGIN_URI}${process.env.NEXT_PUBLIC_DEV_BASE_URL}`;
 
@@ -178,11 +209,63 @@ const SignIn = () => {
                       )}
                     />
                     <div className="flex justify-end gap-2">
-                      <Button variant="link" size="sm">
-                        <FontAwesomeIcon icon={faCircleQuestion} />
-                        忘記密碼?
-                      </Button>
-                      <Button variant="default" size="sm" className="w-1/3">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="link" size="sm">
+                            <FontAwesomeIcon icon={faCircleQuestion} />
+                            忘記密碼?
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>忘記密碼</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              請輸入您註冊時的帳戶(電子信箱)，以重設密碼
+                              <Form {...resetPasswordForm}>
+                                <FormField
+                                  control={resetPasswordForm.control}
+                                  name="account"
+                                  render={({ field }) => (
+                                    <FormItem className="mt-3">
+                                      <FormLabel className="text-primary">
+                                        帳戶
+                                      </FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
+                                          type="email"
+                                          placeholder="請輸入註冊時的電子信箱"
+                                          {...field}
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </Form>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>取消</AlertDialogCancel>
+                            <Button
+                              variant="default"
+                              disabled={!resetPasswordForm.getValues("account")}
+                              onClick={handleForgetPasswordPost}
+                            >
+                              繼續
+                            </Button>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="w-1/3"
+                        disabled={
+                          !form.getValues("account") ||
+                          !form.getValues("password")
+                        }
+                      >
                         登入
                       </Button>
                     </div>
@@ -224,9 +307,7 @@ const SignIn = () => {
             帳號登入
           </Button> */}
           <Button asChild>
-            <Link
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
-            >
+            <Link href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}>
               <GoogleLogo width={30} height={30} className="w-6 h-6" />以 Google
               帳號登入
             </Link>
@@ -240,9 +321,7 @@ const SignIn = () => {
             </Link>
           </Button>
           <Button asChild>
-            <Link
-              href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/line`}
-            >
+            <Link href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/line`}>
               <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
               帳號登入
             </Link>
