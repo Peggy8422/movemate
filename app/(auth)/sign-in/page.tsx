@@ -108,9 +108,9 @@ const SignIn = () => {
 
   // login
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const { token, message } = await login(data.account, data.password);
+    const { success, message, data: token } = await login(data.account, data.password);
     console.log(message);
-    if (token) {
+    if (success) {
       setIsLoginSuccess(true);
       await setCookie("token", token);
       const decodedToken = jwtDecode<UserAuth>(token);
@@ -127,7 +127,7 @@ const SignIn = () => {
   // 記錄一下是否為第一次登入 -> 都先導去首頁，後端回傳資料後再做判斷
   // 是：導向 /preferance-flow
   // 否：導向 /home
-
+ 
   const handleForgetPasswordPost = async () => {
     await forgetPassword(resetPasswordForm.getValues("account"));
   };

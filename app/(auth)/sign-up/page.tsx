@@ -54,13 +54,13 @@ const SignUpForm = ({
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const { token, message } = await signup(
+    const { success, message } = await signup(
       `${data.firstname}${data.lastname}`,
       data.account,
       data.password
     );
-    console.log(token, message);
-    if (token) {
+    console.log(message);
+    if (success) {
       setIsSignupSuccess(true);
       router.push("/sign-in");
     }
