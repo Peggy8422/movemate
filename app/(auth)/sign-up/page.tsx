@@ -1,6 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { signup } from "@/app/actions";
 import {
   Form,
   FormControl,
@@ -12,23 +15,34 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+
 import Link from "next/link";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+// import { jwtDecode, JwtPayload } from "jwt-decode";
+
 const formSchema = z
   .object({
     lastname: z.string().min(1).max(50),
-    firstname: z.string().email(),
-    account: z.string().min(1).max(50), //email
+    firstname: z.string().min(1).max(50),
+    account: z.string().email(), //email
     password: z.string().min(6).max(12),
     checkedPassword: z.string().min(6).max(12),
   })
   .required();
 
-const SignUpForm = () => {
+const SignUpForm = ({
+  setIsSignupSuccess,
+}: {
+  setIsSignupSuccess: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,9 +53,17 @@ const SignUpForm = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    // sent to backend
-    console.log(data);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    const { token, message } = await signup(
+      `${data.firstname}${data.lastname}`,
+      data.account,
+      data.password
+    );
+    console.log(token, message);
+    if (token) {
+      setIsSignupSuccess(true);
+      router.push("/sign-in");
+    }
   };
 
   return (
@@ -145,7 +167,15 @@ const SignUpForm = () => {
           )}
         />
         <div className="flex items-center justify-center gap-2 mt-10">
-          <Button type="submit" size="sm" className="w-1/4 min-w-[150px]">
+          <Button
+            type="submit"
+            size="sm"
+            className="w-1/4 min-w-[150px]"
+            disabled={
+              !form.formState.isValid ||
+              form.getValues("password") !== form.getValues("checkedPassword")
+            }
+          >
             註冊
           </Button>
           <Button
@@ -163,9 +193,33 @@ const SignUpForm = () => {
 };
 
 const SignUp = () => {
+  const [isSignupSuccess, setIsSignupSuccess] = useState(false);
+  // if (isSignupSuccess) {
+  //   setTimeout(() => {
+  //     setIsSignupSuccess(false);
+  //   }, 3000);
+  // }
   return (
     <div className="h-full position-relative">
-      <SignUpForm />
+      <SignUpForm setIsSignupSuccess={setIsSignupSuccess} />
+      {/* alert */}
+      {isSignupSuccess && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.5)]">
+          <Alert className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3">
+            <FontAwesomeIcon
+              icon={faCircleCheck}
+              className="text-2xl"
+              style={{ color: "#22c55e" }}
+            />
+            <AlertTitle className="text-green-500 font-semibold">
+              註冊成功
+            </AlertTitle>
+            <AlertDescription>
+              您已成功註冊會員,請登入以繼續使用Movemate
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
     </div>
   );
 };

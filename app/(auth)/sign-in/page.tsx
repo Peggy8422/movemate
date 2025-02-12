@@ -1,15 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
 import BrandLogo from "@/public/movemate_logo.svg";
 import GoogleLogo from "@/public/google_logo.svg";
-import FacebookLogo from "@/public/facebook_logo.svg";
 import LineLogo from "@/public/line_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleQuestion,
+  faCircleCheck,
+} from "@fortawesome/free-solid-svg-icons";
 
 // import { config } from "@/auth";
 
@@ -21,7 +23,13 @@ import { faCircleQuestion } from "@fortawesome/free-solid-svg-icons";
 // } from "next";
 // import { GET, POST } from "@/app/api/auth/[...nextauth]/route";
 
+import { login } from "@/app/actions";
 import { forgetPassword } from "@/app/actions";
+import { jwtDecode } from "jwt-decode";
+import { setCookie } from "@/app/actions";
+
+// type
+import { UserAuth } from "@/types/user";
 
 // shadcn/ui
 import { Button } from "@/components/ui/button";
@@ -56,9 +64,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
@@ -76,6 +87,9 @@ const resetPasswordSchema = z
 // const providers = config.providers;
 
 const SignIn = () => {
+  const router = useRouter();
+  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
+
   // const { data: session, status } = useSession();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,29 +107,30 @@ const SignIn = () => {
   });
 
   // login
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    // sent to backend
-    console.log(data);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    const { token, message } = await login(data.account, data.password);
+    console.log(message);
+    if (token) {
+      setIsLoginSuccess(true);
+      await setCookie("token", token);
+      const decodedToken = jwtDecode<UserAuth>(token);
+      console.log(decodedToken);
+      await setCookie("user", JSON.stringify(decodedToken));
+      if (!decodedToken.isFilledOutDoc) {
+        router.push("/preferance-flow");
+      } else {
+        router.push("/");
+      }
+    }
   };
 
   // 記錄一下是否為第一次登入 -> 都先導去首頁，後端回傳資料後再做判斷
   // 是：導向 /preferance-flow
   // 否：導向 /home
 
-  // TODO : 1/19 做完第三方登入功能
-  // const handleGoogleLogin = async () => {};
-  // const handleFacebookLogin = () => {};
-  // const handleLineLogin = () => {};
-
   const handleForgetPasswordPost = async () => {
     await forgetPassword(resetPasswordForm.getValues("account"));
   };
-
-  // const lineLoginApi = `${process.env.NEXT_PUBLIC_LINE_LOGIN_URI}${process.env.NEXT_PUBLIC_DEV_BASE_URL}`;
-
-  // if (status === "authenticated") {
-  //   console.log(session);
-  // }
 
   return (
     <div className="flex h-full position-relative max-w-[1440px] mx-auto">
@@ -345,6 +360,20 @@ const SignIn = () => {
           // sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
+      {isLoginSuccess && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.5)]">
+          <Alert className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3">
+            <FontAwesomeIcon
+              icon={faCircleCheck}
+              className="text-3xl"
+              style={{ color: "#22c55e" }}
+            />
+            <AlertTitle className="text-lg text-green-500 font-semibold ml-3">
+              登入成功
+            </AlertTitle>
+          </Alert>
+        </div>
+      )}
     </div>
   );
 };

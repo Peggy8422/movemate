@@ -94,7 +94,7 @@ const NavHeader = () => {
             <div className="relative">
               <Avatar className="cursor-pointer border-2 border-secondary">
                 {/* fetch avatar */}
-                <AvatarImage src={user?.coverPhoto} />
+                <AvatarImage src={user?.coverPhoto || "/default_user_avatar_1.png"} />
                 {/* Fallback: username */}
                 <AvatarFallback>{user?.name}</AvatarFallback>
               </Avatar>

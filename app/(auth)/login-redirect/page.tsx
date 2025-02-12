@@ -2,21 +2,11 @@
 
 import React, { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { jwtDecode, JwtPayload } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { setCookie } from "@/app/actions";
 
-interface CustomJwtPayload extends JwtPayload {
-  id: string;
-  email: string;
-  name: string;
-  googleId: string;
-  facebookId: string;
-  lineId: string;
-  coverPhoto: string;
-  isFilledOutDoc: boolean;
-  iat: number;
-  exp: number;
-}
+// type
+import { UserAuth } from "@/types/user";
 
 export default function LoginRedirect() {
   const router = useRouter();
@@ -24,7 +14,7 @@ export default function LoginRedirect() {
   const token = searchParams.get("token");
 
   if (token) {
-    const decodedToken = jwtDecode<CustomJwtPayload>(token);
+    const decodedToken = jwtDecode<UserAuth>(token);
     if (!decodedToken.isFilledOutDoc) {
       router.push("/preferance-flow");
     } else {
@@ -38,7 +28,7 @@ export default function LoginRedirect() {
     } else {
       const setUserData = async () => {
         await setCookie("token", token);
-        const decodedToken = jwtDecode<CustomJwtPayload>(token);
+        const decodedToken = jwtDecode<UserAuth>(token);
         await setCookie("user", JSON.stringify(decodedToken));
       };
 
