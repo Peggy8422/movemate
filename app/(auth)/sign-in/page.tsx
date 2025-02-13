@@ -12,6 +12,7 @@ import {
   faCircleQuestion,
   faCircleCheck,
 } from "@fortawesome/free-solid-svg-icons";
+import { Loader2 } from "lucide-react";
 
 // import { config } from "@/auth";
 
@@ -54,7 +55,7 @@ import {
 } from "@/components/ui/form";
 import {
   AlertDialog,
-  // AlertDialogAction,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -87,6 +88,7 @@ const resetPasswordSchema = z
 // const providers = config.providers;
 
 const SignIn = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [isLoginSuccess, setIsLoginSuccess] = useState(false);
 
@@ -108,8 +110,13 @@ const SignIn = () => {
 
   // login
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const { success, message, data: token } = await login(data.account, data.password);
-    console.log(message);
+    setIsLoading(true);
+    const {
+      success,
+      message,
+      data: token,
+    } = await login(data.account, data.password);
+    
     if (success) {
       setIsLoginSuccess(true);
       await setCookie("token", token);
@@ -121,15 +128,26 @@ const SignIn = () => {
       } else {
         router.push("/");
       }
+    } else {
+      alert("登入失敗: " + message);
+      setIsLoading(false);
     }
   };
 
   // 記錄一下是否為第一次登入 -> 都先導去首頁，後端回傳資料後再做判斷
   // 是：導向 /preferance-flow
   // 否：導向 /home
- 
+
   const handleForgetPasswordPost = async () => {
-    await forgetPassword(resetPasswordForm.getValues("account"));
+    const { success, message } = await forgetPassword(
+      resetPasswordForm.getValues("account")
+    );
+    console.log(message);
+    if (success) {
+      alert("已發送重設密碼信件至您的信箱, 請儘速修改密碼");
+    } else {
+      alert("發送重設密碼信件失敗, 請稍後再試");
+    }
   };
 
   return (
@@ -262,13 +280,12 @@ const SignIn = () => {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>取消</AlertDialogCancel>
-                            <Button
-                              variant="default"
+                            <AlertDialogAction
                               disabled={!resetPasswordForm.getValues("account")}
                               onClick={handleForgetPasswordPost}
                             >
                               繼續
-                            </Button>
+                            </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
@@ -279,11 +296,15 @@ const SignIn = () => {
                         disabled={
                           !form.formState.isValid ||
                           !form.getValues("account") ||
-                          !form.getValues("password")
+                          !form.getValues("password") ||
+                          isLoading
                         }
                         type="submit"
                       >
-                        登入
+                        {isLoading && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        {isLoading ? "登入中..." : "登入"}
                       </Button>
                     </div>
                   </form>
@@ -335,17 +356,6 @@ const SignIn = () => {
               帳號登入
             </Link>
           </Button>
-          {/* {providers.map((provider) => (
-            <Button
-              key={provider.id}
-              onClick={() => signIn(provider.id, { callbackUrl: "/" })}
-            >
-              {provider.id === "line" && (
-                <LineLogo width={30} height={30} className="w-6 h-6" />
-              )}
-              以 {provider.name} 帳號登入
-            </Button>
-          ))} */}
         </div>
       </div>
       <div className="sm:w-1/2 flex justify-end position-relative">

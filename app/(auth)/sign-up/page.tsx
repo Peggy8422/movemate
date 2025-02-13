@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import { Loader2 } from "lucide-react";
 
 import Link from "next/link";
 
@@ -42,6 +43,7 @@ const SignUpForm = ({
 }: {
   setIsSignupSuccess: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,15 +56,19 @@ const SignUpForm = ({
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
     const { success, message } = await signup(
       `${data.firstname}${data.lastname}`,
       data.account,
       data.password
     );
-    console.log(message);
+
     if (success) {
       setIsSignupSuccess(true);
       router.push("/sign-in");
+    } else {
+      alert("註冊失敗: " + message);
+      setIsLoading(false);
     }
   };
 
@@ -173,10 +179,13 @@ const SignUpForm = ({
             className="w-1/4 min-w-[150px]"
             disabled={
               !form.formState.isValid ||
-              form.getValues("password") !== form.getValues("checkedPassword")
+              form.getValues("password") !==
+                form.getValues("checkedPassword") ||
+              isLoading
             }
           >
-            註冊
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isLoading ? "註冊中..." : "註冊"}
           </Button>
           <Button
             size="sm"

@@ -13,8 +13,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cookies } from 'next/headers'
-import { redirect } from "next/navigation";
 
 const getProfileData = async () => {
   // const response = await fetch("https://api.example.com/profile");
@@ -49,12 +47,6 @@ const Profile = async () =>
   //   selfIntroduction: string;
   // }
   {
-    const token = cookies().get("token");
-    if (!token) {
-      redirect("/sign-in");
-    } else {
-      console.log(token);
-    }
     // fetch data here
     const { userName, livingArea, userLevel, selfIntroduction, personalTags } =
       await getProfileData();

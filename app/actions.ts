@@ -73,7 +73,7 @@ export async function forgetPassword(userEmail: string) {
       body: JSON.stringify({ email: userEmail }),
     });
     const data = await res.json();
-    return data.message;
+    return data;
   } catch (error) {
     console.log(error);
     throw new Error("Something went wrong");
@@ -96,7 +96,7 @@ export async function resetPassword(
       }),
     });
     const data = await res.json();
-    return data.message;
+    return data;
   } catch (error) {
     console.log(error);
     throw new Error("Something went wrong");
