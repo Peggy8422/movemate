@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState } from "react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -151,246 +151,240 @@ const SignIn = () => {
   };
 
   return (
-    <Suspense>
-      <div className="flex h-full position-relative max-w-[1440px] mx-auto">
-        <div className="w-full sm:w-1/2 flex flex-col items-center sm:items-start justify-center px-10 h-full">
-          <div className="flex items-center">
-            <BrandLogo
-              fill="#001f54"
-              width={60}
-              height={60}
-              className="mr-4 w-12 sm:w-20 md:w-24 sm:mb-3"
-            />
-            <h1 className="font-baloo text-4xl sm:text-5xl md:text-6xl font-bold text-primary">
-              MoveMate
-            </h1>
-          </div>
-          <p className="font-notoSans font-normal mb-3 pl-1 text-s md:text-base text-center sm:text-left tracking-widest">
-            找尋志同道合的運動夥伴，快速搜索附近最適當的運動場所，享受健身樂趣、營造健康的生活
-          </p>
-          {/* card with tabs for sign in */}
-          <Tabs
-            defaultValue="signin"
-            // value={tab}
-            // onValueChange={(value) => {
-            //   setTab(value);
-            // }}
-            className="w-full max-w-[600px]"
-          >
-            <Card className="w-full">
-              <CardHeader className="py-3 px-0">
-                <TabsList className="grid w-full grid-cols-2 p-0 bg-transparent">
-                  <TabsTrigger
-                    value="signin"
-                    className="rounded-none text-secondary text-base border-b-2 border-b-secondary data-[state=active]:text-primary data-[state=active]:border-b-primary"
+    <div className="flex h-full position-relative max-w-[1440px] mx-auto">
+      <div className="w-full sm:w-1/2 flex flex-col items-center sm:items-start justify-center px-10 h-full">
+        <div className="flex items-center">
+          <BrandLogo
+            fill="#001f54"
+            width={60}
+            height={60}
+            className="mr-4 w-12 sm:w-20 md:w-24 sm:mb-3"
+          />
+          <h1 className="font-baloo text-4xl sm:text-5xl md:text-6xl font-bold text-primary">
+            MoveMate
+          </h1>
+        </div>
+        <p className="font-notoSans font-normal mb-3 pl-1 text-s md:text-base text-center sm:text-left tracking-widest">
+          找尋志同道合的運動夥伴，快速搜索附近最適當的運動場所，享受健身樂趣、營造健康的生活
+        </p>
+        {/* card with tabs for sign in */}
+        <Tabs
+          defaultValue="signin"
+          // value={tab}
+          // onValueChange={(value) => {
+          //   setTab(value);
+          // }}
+          className="w-full max-w-[600px]"
+        >
+          <Card className="w-full">
+            <CardHeader className="py-3 px-0">
+              <TabsList className="grid w-full grid-cols-2 p-0 bg-transparent">
+                <TabsTrigger
+                  value="signin"
+                  className="rounded-none text-secondary text-base border-b-2 border-b-secondary data-[state=active]:text-primary data-[state=active]:border-b-primary"
+                >
+                  登入
+                </TabsTrigger>
+                <TabsTrigger
+                  value="signup"
+                  className="rounded-none text-secondary text-base border-b-2 border-b-secondary data-[state=active]:text-primary data-[state=active]:border-b-primary"
+                >
+                  註冊
+                </TabsTrigger>
+              </TabsList>
+            </CardHeader>
+            <CardContent className="h-[33vh]">
+              <TabsContent value="signin">
+                {/* <CardTitle className="mb-2">Sign in</CardTitle> */}
+                <CardDescription className="text-center tracking-wider">
+                  歡迎回來! 請先登入以繼續使用
+                </CardDescription>
+                {/* Sign in form */}
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="flex flex-col gap-4 mb-3 px-6"
                   >
-                    登入
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="signup"
-                    className="rounded-none text-secondary text-base border-b-2 border-b-secondary data-[state=active]:text-primary data-[state=active]:border-b-primary"
+                    <FormField
+                      control={form.control}
+                      name="account"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-primary">帳戶</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
+                              type="email"
+                              placeholder="請輸入註冊時的帳戶(電子信箱)"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-primary">密碼</FormLabel>
+                          <FormControl>
+                            <Input
+                              className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
+                              type="password"
+                              placeholder="請輸入註冊時的密碼"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex justify-end gap-2">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="link" size="sm">
+                            <FontAwesomeIcon icon={faCircleQuestion} />
+                            忘記密碼?
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>忘記密碼</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              請輸入您註冊時的帳戶(電子信箱)，以重設密碼
+                              <Form {...resetPasswordForm}>
+                                <FormField
+                                  control={resetPasswordForm.control}
+                                  name="account"
+                                  render={({ field }) => (
+                                    <FormItem className="mt-3">
+                                      <FormLabel className="text-primary">
+                                        帳戶
+                                      </FormLabel>
+                                      <FormControl>
+                                        <Input
+                                          className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
+                                          type="email"
+                                          placeholder="請輸入註冊時的電子信箱"
+                                          {...field}
+                                        />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </Form>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>取消</AlertDialogCancel>
+                            <AlertDialogAction
+                              disabled={!resetPasswordForm.getValues("account")}
+                              onClick={handleForgetPasswordPost}
+                            >
+                              繼續
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="w-1/3"
+                        disabled={
+                          !form.formState.isValid ||
+                          !form.getValues("account") ||
+                          !form.getValues("password") ||
+                          isLoading
+                        }
+                        type="submit"
+                      >
+                        {isLoading && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        {isLoading ? "登入中..." : "登入"}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </TabsContent>
+              <TabsContent value="signup">
+                <CardDescription className="text-center tracking-wider pt-6">
+                  現在就加入我們!
+                  <br />
+                  在這裡與你的健身夥伴們分享運動經驗
+                </CardDescription>
+                <div className="text-center mt-6">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="w-full md:w-1/2"
+                    asChild
                   >
-                    註冊
-                  </TabsTrigger>
-                </TabsList>
-              </CardHeader>
-              <CardContent className="h-[33vh]">
-                <TabsContent value="signin">
-                  {/* <CardTitle className="mb-2">Sign in</CardTitle> */}
-                  <CardDescription className="text-center tracking-wider">
-                    歡迎回來! 請先登入以繼續使用
-                  </CardDescription>
-                  {/* Sign in form */}
-                  <Form {...form}>
-                    <form
-                      onSubmit={form.handleSubmit(onSubmit)}
-                      className="flex flex-col gap-4 mb-3 px-6"
-                    >
-                      <FormField
-                        control={form.control}
-                        name="account"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-primary">帳戶</FormLabel>
-                            <FormControl>
-                              <Input
-                                className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
-                                type="email"
-                                placeholder="請輸入註冊時的帳戶(電子信箱)"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-primary">密碼</FormLabel>
-                            <FormControl>
-                              <Input
-                                className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
-                                type="password"
-                                placeholder="請輸入註冊時的密碼"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="flex justify-end gap-2">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="link" size="sm">
-                              <FontAwesomeIcon icon={faCircleQuestion} />
-                              忘記密碼?
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>忘記密碼</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                請輸入您註冊時的帳戶(電子信箱)，以重設密碼
-                                <Form {...resetPasswordForm}>
-                                  <FormField
-                                    control={resetPasswordForm.control}
-                                    name="account"
-                                    render={({ field }) => (
-                                      <FormItem className="mt-3">
-                                        <FormLabel className="text-primary">
-                                          帳戶
-                                        </FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
-                                            type="email"
-                                            placeholder="請輸入註冊時的電子信箱"
-                                            {...field}
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                </Form>
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>取消</AlertDialogCancel>
-                              <AlertDialogAction
-                                disabled={
-                                  !resetPasswordForm.getValues("account")
-                                }
-                                onClick={handleForgetPasswordPost}
-                              >
-                                繼續
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="w-1/3"
-                          disabled={
-                            !form.formState.isValid ||
-                            !form.getValues("account") ||
-                            !form.getValues("password") ||
-                            isLoading
-                          }
-                          type="submit"
-                        >
-                          {isLoading && (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          )}
-                          {isLoading ? "登入中..." : "登入"}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </TabsContent>
-                <TabsContent value="signup">
-                  <CardDescription className="text-center tracking-wider pt-6">
-                    現在就加入我們!
-                    <br />
-                    在這裡與你的健身夥伴們分享運動經驗
-                  </CardDescription>
-                  <div className="text-center mt-6">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="w-full md:w-1/2"
-                      asChild
-                    >
-                      <Link href="/sign-up">建立新帳戶</Link>
-                    </Button>
-                  </div>
-                </TabsContent>
-              </CardContent>
-            </Card>
-          </Tabs>
-          {/* buttons for social media logins */}
-          <div className="flex flex-col gap-4 mt-6 w-full md:w-1/2 min-w-[250px]">
-            {/* <Button onClick={handleGoogleLogin}>
+                    <Link href="/sign-up">建立新帳戶</Link>
+                  </Button>
+                </div>
+              </TabsContent>
+            </CardContent>
+          </Card>
+        </Tabs>
+        {/* buttons for social media logins */}
+        <div className="flex flex-col gap-4 mt-6 w-full md:w-1/2 min-w-[250px]">
+          {/* <Button onClick={handleGoogleLogin}>
             <GoogleLogo width={30} height={30} className="w-6 h-6" />以 Google
             帳號登入
           </Button> */}
-            {/* <Button onClick={handleFacebookLogin}>
+          {/* <Button onClick={handleFacebookLogin}>
             <FacebookLogo width={30} height={30} className="w-6 h-6" />以
             Facebook 帳號登入
           </Button> */}
-            {/* <Button onClick={handleLineLogin}>
+          {/* <Button onClick={handleLineLogin}>
             <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
             帳號登入
           </Button> */}
-            <Button asChild>
-              <Link
-                href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}
-              >
-                <GoogleLogo width={30} height={30} className="w-6 h-6" />以
-                Google 帳號登入
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/line`}>
-                <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
-                帳號登入
-              </Link>
-            </Button>
-          </div>
+          <Button asChild>
+            <Link href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}>
+              <GoogleLogo width={30} height={30} className="w-6 h-6" />以 Google
+              帳號登入
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/line`}>
+              <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
+              帳號登入
+            </Link>
+          </Button>
         </div>
-        <div className="sm:w-1/2 flex justify-end position-relative">
-          <Image
-            className="object-cover hidden sm:block"
-            src="/movemate_cover_img.png"
-            alt="movemate cover"
-            width={500}
-            height={600}
-            priority
-            // fill={true}
-            // sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        </div>
-        {isLoginSuccess && (
-          <div className="absolute top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.5)]">
-            <Alert className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3">
-              <FontAwesomeIcon
-                icon={faCircleCheck}
-                className="text-3xl"
-                style={{ color: "#22c55e" }}
-              />
-              <AlertTitle className="text-lg text-green-500 font-semibold ml-3">
-                登入成功
-              </AlertTitle>
-            </Alert>
-          </div>
-        )}
       </div>
-    </Suspense>
+      <div className="sm:w-1/2 flex justify-end position-relative">
+        <Image
+          className="object-cover hidden sm:block"
+          src="/movemate_cover_img.png"
+          alt="movemate cover"
+          width={500}
+          height={600}
+          priority
+          // fill={true}
+          // sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+      </div>
+      {isLoginSuccess && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.5)]">
+          <Alert className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3">
+            <FontAwesomeIcon
+              icon={faCircleCheck}
+              className="text-3xl"
+              style={{ color: "#22c55e" }}
+            />
+            <AlertTitle className="text-lg text-green-500 font-semibold ml-3">
+              登入成功
+            </AlertTitle>
+          </Alert>
+        </div>
+      )}
+    </div>
   );
 };
 

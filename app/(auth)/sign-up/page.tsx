@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { signup } from "@/app/actions";
@@ -209,29 +209,27 @@ const SignUp = () => {
   //   }, 3000);
   // }
   return (
-    <Suspense>
-      <div className="h-full position-relative">
-        <SignUpForm setIsSignupSuccess={setIsSignupSuccess} />
-        {/* alert */}
-        {isSignupSuccess && (
-          <div className="absolute top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.5)]">
-            <Alert className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3">
-              <FontAwesomeIcon
-                icon={faCircleCheck}
-                className="text-2xl"
-                style={{ color: "#22c55e" }}
-              />
-              <AlertTitle className="text-green-500 font-semibold">
-                註冊成功
-              </AlertTitle>
-              <AlertDescription>
-                您已成功註冊會員,請登入以繼續使用Movemate
-              </AlertDescription>
-            </Alert>
-          </div>
-        )}
-      </div>
-    </Suspense>
+    <div className="h-full position-relative">
+      <SignUpForm setIsSignupSuccess={setIsSignupSuccess} />
+      {/* alert */}
+      {isSignupSuccess && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.5)]">
+          <Alert className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3">
+            <FontAwesomeIcon
+              icon={faCircleCheck}
+              className="text-2xl"
+              style={{ color: "#22c55e" }}
+            />
+            <AlertTitle className="text-green-500 font-semibold">
+              註冊成功
+            </AlertTitle>
+            <AlertDescription>
+              您已成功註冊會員,請登入以繼續使用Movemate
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+    </div>
   );
 };
 
