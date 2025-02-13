@@ -1,6 +1,10 @@
 "use client";
 
 import React from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+
+import { resetPassword } from "@/app/actions";
+
 import {
   Form,
   FormControl,
@@ -24,18 +28,32 @@ const formSchema = z
   .required();
 
 const ResetPasswordForm = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+  console.log(token);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      account: "",
       password: "",
-      confirmPassword: "",                                          
-    },               
+      confirmPassword: "",
+    },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     // sent to backend
     console.log(data);
+    const { success, message } = await resetPassword(
+      data.password,
+      token || ""
+    );
+    if (success) {
+      alert("密碼重設成功");
+      router.push("/sign-in");
+    } else {
+      alert("密碼重設失敗: " + message);
+    }
   };
 
   return (
@@ -44,7 +62,7 @@ const ResetPasswordForm = () => {
         重設密碼
       </h1>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
+        {/* <FormField
           control={form.control}
           name="account"
           render={({ field }) => (
@@ -60,7 +78,7 @@ const ResetPasswordForm = () => {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <FormField
           control={form.control}
           name="password"
