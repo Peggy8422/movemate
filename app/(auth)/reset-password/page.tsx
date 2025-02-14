@@ -21,7 +21,7 @@ import { useForm } from "react-hook-form";
 
 const formSchema = z
   .object({
-    account: z.string().email(),
+    // account: z.string().email(),
     password: z.string().min(6).max(12),
     confirmPassword: z.string().min(6).max(12),
   })
@@ -31,7 +31,6 @@ const ResetPasswordForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  console.log(token);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,23 +61,6 @@ const ResetPasswordForm = () => {
         重設密碼
       </h1>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        {/* <FormField
-          control={form.control}
-          name="account"
-          render={({ field }) => (
-            <FormItem className="mb-3">
-              <FormLabel>帳戶（電子信箱）</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  placeholder="輸入註冊時的電子信箱（ex: test@example.com)"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
         <FormField
           control={form.control}
           name="password"
