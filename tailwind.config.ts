@@ -67,8 +67,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        baloo: ["Baloo 2", "sans-serif"],
-        notoSans: ["Noto Sans", "serif"],
+        baloo: ["'Baloo 2'", "sans-serif"],
+        notoSans: ["'Noto Sans TC'", "serif"],
       },
     },
   },
