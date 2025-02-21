@@ -61,7 +61,7 @@ const LoginRedirectPageContent = () => {
 
 const LoginRedirect = () => {
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <LoginRedirectPageContent></LoginRedirectPageContent>
     </Suspense>
   );
