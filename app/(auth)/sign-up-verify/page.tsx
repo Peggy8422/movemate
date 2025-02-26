@@ -46,7 +46,6 @@ const SignUpVerifyPageContent = () => {
           </Button>
         </CardFooter>
       </Card>
-      {/* <p>{verifiedResultMsg}</p> */}
     </div>
   );
 };

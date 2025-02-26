@@ -57,19 +57,20 @@ const SignUpForm = ({
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    const { success, message } = await signup(
+    const { message } = await signup(
       `${data.firstname}${data.lastname}`,
       data.account,
       data.password
     );
 
-    if (success) {
-      setIsSignupSuccess(true);
-      router.push("/sign-in");
-    } else {
-      alert("註冊失敗: " + message);
-      setIsLoading(false);
-    }
+    // if (success) {
+    //   setIsSignupSuccess(true);
+    //   router.push("/sign-in");
+    // } else {
+    alert(message);
+    setIsLoading(false);
+    form.reset();
+    // }
   };
 
   return (

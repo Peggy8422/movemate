@@ -1,8 +1,31 @@
 import React from "react";
 
 import PreferanceFlowForm from "@/components/preferance-flow-form";
-const PreferanceFlow = () => {
-  return (<PreferanceFlowForm />);
+import { getCookie } from "@/app/actions";
+
+
+const getFlowQuestions = async () => {
+  const token = await getCookie("token");
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/flow/getFlow`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token?.value}`,
+      },
+    }
+  );
+  const data = await response.json();
+  return {
+    questions: data.data,
+  };
+};
+
+const PreferanceFlow = async () => {
+  const { questions } = await getFlowQuestions();
+
+  return <PreferanceFlowForm questions={questions} />;
 };
 
 export default PreferanceFlow;

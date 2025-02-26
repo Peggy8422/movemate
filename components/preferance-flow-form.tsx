@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -34,7 +33,6 @@ import {
   purposeOptions,
   frequencyOptions,
 } from "@/consts/preferance-flow-options";
-import { getCookie } from "@/app/actions";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -65,20 +63,10 @@ const formSchema = z
   })
   .required();
 
-const PreferanceFlowForm = () => {
+const PreferanceFlowForm = ({ questions }: any) => {
+  // test: get questions
+  console.log(questions);
   const [currentStep, setCurrentStep] = useState(1);
-  const router = useRouter();
-
-  useEffect(() => {
-    const getToken = async () => {
-      const token = await getCookie("token");
-      if (!token) {
-        router.push("/sign-in");
-      }
-    };
-
-    getToken();
-  }, [router]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     mode: "onChange",
@@ -247,6 +235,17 @@ const PreferanceFlowForm = () => {
               />
             </div>
           )}
+          {/* map questions */}
+          {questions.map((question: any, index: number) => {
+            return (
+              currentStep === index + 2 && (
+                <div>
+                  <h1 className="mb-6">Q{index + 2}: 請問您{question.title}</h1>
+                </div>
+              )
+            );
+          })}
+
           {currentStep === 2 && (
             <div>
               <h1 className="mb-6">Q2: 請問您的居住地？</h1>
