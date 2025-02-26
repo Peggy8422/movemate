@@ -6,7 +6,8 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (
     pathname.startsWith("/api") ||
-    pathname.startsWith("/_next") ||
+    pathname.startsWith("/_next/static") ||
+    pathname.startsWith("/_next/image") ||
     pathname === "/favicon.ico" ||
     pathname === "/sitemap.xml" ||
     pathname === "/robots.txt" ||
@@ -16,17 +17,17 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/reset-password")
   ) {
     return NextResponse.next();
-  }
-
-  if (!request.cookies.has("token")) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
   } else {
-    return NextResponse.next();
+    if (!request.cookies.has("token")) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    } else {
+      return NextResponse.next();
+    }
   }
 }
 
 // export const config = {
 //   matcher: [
-//     "/((?!api/|_next/|favicon.ico|sitemap.xml|robots.txt|sign-in|sign-up|login-redirect|reset-password).*)",
+//     "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|sign-in|sign-up|login-redirect|reset-password).*)",
 //   ],
 // };
