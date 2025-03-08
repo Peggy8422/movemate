@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import taiwanCityDistrictRoads from "@/public/json/taiwan_city_district_road.json";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -38,6 +39,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+import { Question } from "@/types/question";
+
 const formSchema = z
   .object({
     height: z.number().min(1).int().nullable(),
@@ -63,6 +66,13 @@ const formSchema = z
   })
   .required();
 
+const questionNameMap : any = {
+  "最常在哪裡運動？": "place",
+  "喜歡的運動種類？": "sportType",
+  "的運動頻率？": "frequency",
+  "的運動目的？": "purpose",
+};
+
 const PreferanceFlowForm = ({ questions }: any) => {
   // test: get questions
   console.log(questions);
@@ -87,9 +97,18 @@ const PreferanceFlowForm = ({ questions }: any) => {
     },
   });
 
+  let districtOptions = taiwanCityDistrictRoads.find(
+    (item: any) => item.CityName === form.watch("city")
+  )?.AreaList;
+  let roadOptions = districtOptions?.find(
+    (item: any) => item.AreaName === form.watch("district")
+  )?.RoadList;
+
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     // sent to backend
     console.log(data);
+
+    const payload = [{}];
   };
 
   const handlePrevStep = (e: React.FormEvent) => {
@@ -236,115 +255,207 @@ const PreferanceFlowForm = ({ questions }: any) => {
             </div>
           )}
           {/* map questions */}
-          {questions.map((question: any, index: number) => {
+          {questions?.map((question: Question, index: number) => {
             return (
               currentStep === index + 2 && (
-                <div>
-                  <h1 className="mb-6">Q{index + 2}: 請問您{question.title}</h1>
+                <div key={question.id}>
+                  <h1 className="mb-6">
+                    Q{index + 2}: 請問您{question.title}
+                  </h1>
+                  {index + 2 === 2 && (
+                    <>
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem className="mb-6 flex gap-2">
+                            <FormLabel className="w-[100px] min-w-fit pt-2">
+                              縣市
+                            </FormLabel>
+                            <div className="flex-grow">
+                              <FormControl>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="請選擇縣市" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {taiwanCityDistrictRoads.map(
+                                      (city: any) => (
+                                        <SelectItem
+                                          key={city.CityEngName}
+                                          value={city.CityName}
+                                        >
+                                          {city.CityName}
+                                        </SelectItem>
+                                      )
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="district"
+                        render={({ field }) => (
+                          <FormItem className="mb-6 flex gap-2">
+                            <FormLabel className="w-[100px] min-w-fit pt-2">
+                              區（鄉鎮）
+                            </FormLabel>
+                            <div className="flex-grow">
+                              <FormControl>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                  disabled={form.getValues("city") === ""}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="請選擇區（鄉鎮）" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {districtOptions?.map((district: any) => (
+                                      <SelectItem
+                                        key={district.AreaEngName}
+                                        value={district.AreaName}
+                                      >
+                                        {district.AreaName}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="road"
+                        render={({ field }) => (
+                          <FormItem className="mb-6 flex gap-2">
+                            <FormLabel className="w-[100px] min-w-fit pt-2">
+                              路（街）
+                            </FormLabel>
+                            <div className="flex-grow">
+                              <FormControl>
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value}
+                                  disabled={form.getValues("district") === ""}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="請選擇路（街）名" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {roadOptions?.map((road: any) => (
+                                      <SelectItem
+                                        key={road.RoadEngName}
+                                        value={road.RoadName}
+                                      >
+                                        {road.RoadName}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
+                  {/* 選擇題 */}
+                  {index + 2 >= 3 &&
+                    (question.isSingle ? (
+                      <FormField
+                        control={form.control}
+                        name={questionNameMap[question.title]}
+                        render={({ field }) => (
+                          <FormItem className="mb-6">
+                            <FormControl>
+                              <RadioGroup
+                                defaultValue={field.value}
+                                onValueChange={field.onChange}
+                                className="space-y-4"
+                              >
+                                {question.selections.map((option: any) => (
+                                  <div
+                                    key={option.id}
+                                    className="flex items-center space-x-2"
+                                  >
+                                    <RadioGroupItem
+                                      value={option.id}
+                                      id={option.id}
+                                    />
+                                    <Label
+                                      htmlFor={option.id}
+                                      className="font-normal"
+                                    >
+                                      {option.selection}
+                                    </Label>
+                                  </div>
+                                ))}
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ) : (
+                      question.selections.map((option: any, index: number) => (
+                        <FormField
+                          key={option.id}
+                          control={form.control}
+                          name={questionNameMap[question.title]}
+                          render={({ field }) => (
+                            <FormItem className="mb-3 flex items-center gap-2">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(option.id)}
+                                  onCheckedChange={(checked: boolean) => {
+                                    return checked
+                                      ? field.onChange(
+                                          field.value !== null
+                                            ? [...field.value, option.id]
+                                            : [option.id]
+                                        )
+                                      : field.onChange(
+                                          field.value?.filter(
+                                            (value: string) => value !== option.id
+                                          )
+                                        );
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="text-sm font-normal mt-0">
+                                {option.selection}
+                              </FormLabel>
+                              {index === 0 && <FormMessage />}
+                            </FormItem>
+                          )}
+                        />
+                      ))
+                    ))}
                 </div>
               )
             );
           })}
 
-          {currentStep === 2 && (
-            <div>
-              <h1 className="mb-6">Q2: 請問您的居住地？</h1>
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[100px] min-w-fit pt-2">
-                      縣市
-                    </FormLabel>
-                    <div className="flex-grow">
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="請選擇縣市" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="taipei">台北市</SelectItem>
-                            <SelectItem value="toayuan">桃園市</SelectItem>
-                            <SelectItem value="keelung">基隆市</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="district"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[100px] min-w-fit pt-2">
-                      區（鄉鎮）
-                    </FormLabel>
-                    <div className="flex-grow">
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="請選擇區（鄉鎮）" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="beitou">北投區</SelectItem>
-                            <SelectItem value="shilin">士林區</SelectItem>
-                            <SelectItem value="zhongzheng">中正區</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="road"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[100px] min-w-fit pt-2">
-                      路（街）
-                    </FormLabel>
-                    <div className="flex-grow">
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="請選擇路（街）名" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="linong st2">
-                              立農街二段
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          {currentStep === 3 && (
+          {/* {currentStep === 3 && (
             <div>
               <h1 className="mb-6">Q3: 請問您最常在哪裡運動?</h1>
               <FormField
@@ -497,7 +608,7 @@ const PreferanceFlowForm = ({ questions }: any) => {
                 />
               ))}
             </div>
-          )}
+          )} */}
           <div className="mt-10 flex justify-end gap-2">
             {currentStep > 1 && (
               <Button
