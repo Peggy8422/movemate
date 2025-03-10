@@ -2,5 +2,13 @@ export interface Question {
   id: string;
   title: string;
   isSingle: boolean;
-  selections: object[];
+  isBasic: boolean;
+  order: number;
+  selections: object[
+    {
+      id: string;
+      selection: string;
+      textAnswer?: string;
+    }
+  ];
 }
