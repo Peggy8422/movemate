@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import taiwanCityDistrictRoads from "@/public/json/taiwan_city_district_road.json";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -40,6 +41,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { Question } from "@/types/question";
+import { getCookie } from "@/app/actions";
 
 const formSchema = z
   .object({
@@ -80,6 +82,7 @@ const questionNameMap: { [key: string]: string } = {
 
 const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     mode: "onChange",
@@ -120,7 +123,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
     }) => item.AreaName === form.watch("district")
   )?.RoadList;
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     // sent to backend
     console.log(data);
     const payload = questions.map((question: Question) => ({
@@ -141,7 +144,25 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
             ]?.toString()
           : null,
     }));
-    console.log("Answer: ",payload);
+
+    const token = await getCookie("token");
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/flow/saveFlowAnswer`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token?.value}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    const { message, success } = await res.json();
+    console.log(message);
+    if (success) {
+      alert("個人偏好設定完成!");
+      router.push("/");
+    }
   };
 
   const handlePrevStep = (e: React.FormEvent) => {
@@ -211,6 +232,9 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                         <FormItem className="mb-6 flex gap-2">
                           <FormLabel className="w-[80px] min-w-fit pt-2">
                             {question.title}
+                            {question.title === "身高" && "(cm)"}
+                            {question.title === "體重" && "(kg)"}
+                            {question.title === "年齡" && "(歲)"}
                           </FormLabel>
                           <div className="flex-grow">
                             <FormControl>

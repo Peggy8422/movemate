@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
 import { signup } from "@/app/actions";
 import {
@@ -44,7 +44,7 @@ const SignUpForm = ({
   setIsSignupSuccess: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
