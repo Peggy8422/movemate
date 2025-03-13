@@ -10,12 +10,14 @@ import {
 import { cn } from "@/lib/utils";
 
 const CommunityListItem = ({
+  isFullWidth = false,
   isMobileScreen = false,
   name,
   description,
   avatarSrc,
   membersNum,
 }: {
+  isFullWidth?: boolean;
   isMobileScreen: boolean;
   name: string;
   description: string;
@@ -25,7 +27,8 @@ const CommunityListItem = ({
   return (
     <div
       className={cn(
-        "text-center lg:w-1/2 p-2",
+        "text-center p-2",
+        isFullWidth ? "lg:w-full" : "lg:w-1/2",
         isMobileScreen ? "w-1/2" : "w-full"
       )}
     >
