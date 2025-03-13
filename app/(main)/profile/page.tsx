@@ -13,28 +13,49 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { getCookie } from "@/app/actions";
 
 const getProfileData = async () => {
-  // const response = await fetch("https://api.example.com/profile");
-  // const data = await response.json();
+  console.log("get profile data!");
+  const token = await getCookie("token");
+  const userData = await getCookie("user");
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/flow/getFlowAnswer`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token?.value}`,
+      },
+    }
+  );
+  const { data } = await response.json();
+  let userBasicInfo;
+  console.log(data);
+  if (userData?.value) {
+    userBasicInfo = JSON.parse(userData.value);
+  }
   // return data;
   return {
-    userName: "Peggy Chuang",
-    livingArea: "台北市",
+    userName: userBasicInfo.name,
+    livingArea: data
+      .find((item: { questionTitle: string }) => item.questionTitle === "住哪?")
+      ?.textAnswer.slice(0, 3),
     userLevel: "1",
-    selfIntroduction:
-      "hqvujehqwgiyuhhnewklqnlekw;qnfjkwnqf;knew qfj;nweq;fnwekqnfelwqnfkwnqflkwqnfk ac,ms vhffjjfv.",
-    personalTags: [
-      "喜歡動物",
-      "喜歡旅遊",
-      "喜歡美食",
-      "喜歡運動",
-    ],
+    selfIntroduction: "",
+    personalTags: ["喜歡動物", "喜歡旅遊", "喜歡美食", "喜歡運動"],
+    preferance: {
+      place: data
+        .find((item: { questionTitle: string }) => item.questionTitle === "最常在哪裡運動？")
+        .selections,
+      sportType: data
+        .find((item: { questionTitle: string }) => item.questionTitle === "喜歡的運動種類？")
+        .selections,
+    }
   };
 };
 
 const Profile = async () =>
-    
   //   {
   //   userName = "Peggy Chuang",
   //   livingArea = "台北市",
@@ -88,10 +109,7 @@ const Profile = async () =>
             {/* tags here */}
             <div className="flex gap-2">
               {personalTags.map((tag) => (
-                <Badge
-                  key={tag}
-                  className=""
-                >
+                <Badge key={tag} className="">
                   #{tag}
                 </Badge>
               ))}
@@ -111,13 +129,22 @@ const Profile = async () =>
             </Button>
           </h3>
           <div className="flex flex-wrap gap-3 ">
-            <Badge variant="secondary" className="text-sm rounded-sm shadow-sm text-neutral-100">
+            <Badge
+              variant="secondary"
+              className="text-sm rounded-sm shadow-sm text-neutral-100"
+            >
               健身房
             </Badge>
-            <Badge variant="secondary" className="text-sm rounded-sm shadow-sm text-neutral-100">
+            <Badge
+              variant="secondary"
+              className="text-sm rounded-sm shadow-sm text-neutral-100"
+            >
               公園
             </Badge>
-            <Badge variant="secondary" className="text-sm rounded-sm shadow-sm text-neutral-100">
+            <Badge
+              variant="secondary"
+              className="text-sm rounded-sm shadow-sm text-neutral-100"
+            >
               社區運動中心
             </Badge>
           </div>
@@ -134,9 +161,12 @@ const Profile = async () =>
             </Button>
           </h3>
           <div className="flex flex-wrap gap-3 ">
-            <Badge variant="secondary" className="text-sm rounded-sm shadow-sm text-neutral-100">
+            <Badge
+              variant="secondary"
+              className="text-sm rounded-sm shadow-sm text-neutral-100"
+            >
               瑜珈
-            </Badge>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+            </Badge>
           </div>
         </div>
       </div>
