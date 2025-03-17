@@ -14,28 +14,36 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
+// import { Input } from "@/components/ui/input";
+// import { Textarea } from "@/components/ui/textarea";
+// import { Label } from "@/components/ui/label";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogDescription,
+//   DialogHeader,
+//   DialogFooter,
+//   DialogTitle,
+//   DialogTrigger,
+//   DialogClose,
+// } from "@/components/ui/dialog";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLocationDot,
   faPlus,
-  faCamera,
+  // faCamera,
+  // faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getCookie } from "@/app/actions";
+
+import {
+  EditCoverPhoto,
+  EditAvatar,
+  EditBasicInfo,
+} from "@/components/edit-profile-dialogs";
 
 const getProfileData = async () => {
   const token = await getCookie("token");
@@ -125,42 +133,11 @@ const Profile = async () => {
           className="w-full h-60 object-cover"
           src={userCoverPhoto}
           alt="Profile Cover"
+          priority
           width={1000}
           height={500}
         />
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="absolute right-5 top-5" variant="outline">
-              <FontAwesomeIcon icon={faCamera} />
-              編輯封面照
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>編輯封面照</DialogTitle>
-              <DialogDescription>
-                上傳照片檔案以更換封面相片（格式：jpg, png, jpeg，檔案大小不超過
-                5MB）
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  照片檔案
-                </Label>
-                <Input id="name" type="file" className="col-span-3" />
-              </div>
-            </div>
-            <DialogFooter className="sm:justify-end">
-              <DialogClose asChild>
-                <Button type="button" variant="secondary">
-                  取消
-                </Button>
-              </DialogClose>
-              <Button type="submit">儲存</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <EditCoverPhoto></EditCoverPhoto>
         <div className="absolute ml-5 -mt-10">
           <Image
             className="border-4 border-white rounded-xl"
@@ -169,38 +146,7 @@ const Profile = async () => {
             width={100}
             height={100}
           />
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="absolute -bottom-3 -left-3" variant="outline" size="icon">
-                <FontAwesomeIcon icon={faCamera} />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>編輯大頭貼照</DialogTitle>
-                <DialogDescription>
-                  上傳照片檔案以更換大頭貼照（格式：jpg, png, jpeg，檔案大小不超過
-                  5MB）
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    照片檔案
-                  </Label>
-                  <Input id="name" type="file" className="col-span-3" />
-                </div>
-              </div>
-              <DialogFooter className="sm:justify-end">
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    取消
-                  </Button>
-                </DialogClose>
-                <Button type="submit">儲存</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <EditAvatar></EditAvatar>
         </div>
         <CardHeader className="relative w-[calc(100%-120px)] flex flex-row flex-wrap items-end gap-3 left-[120px] px-3 py-3">
           <CardTitle className="text-primary">{userName}</CardTitle>
@@ -224,14 +170,17 @@ const Profile = async () => {
         </CardContent>
         <CardFooter className="">
           {/* tags here */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {personalTags.map((tag) => (
-              <Badge key={tag} className="">
-                #{tag}
-              </Badge>
+              <Badge key={tag}>#{tag}</Badge>
             ))}
           </div>
         </CardFooter>
+        <EditBasicInfo
+          userName={userName}
+          selfIntroduction={selfIntroduction}
+          personalTags={personalTags}
+        ></EditBasicInfo>
       </Card>
       <Separator className="my-4" />
       <div className="mb-6">
