@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 
 import {
   Dialog,
@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+// import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -54,7 +54,7 @@ const avatarSchema = z.object({
 const basicInfoSchema = z.object({
   userName: z.string().min(2).max(100),
   selfIntroduction: z.string().min(1).max(500),
-  personalTags: z.string().array(),
+  tag: z.string().min(1).max(10),
 });
 
 const EditCoverPhoto = () => {
@@ -124,6 +124,13 @@ const EditCoverPhoto = () => {
 };
 
 const EditAvatar = () => {
+  const form = useForm<z.infer<typeof avatarSchema>>({
+    resolver: zodResolver(avatarSchema),
+    defaultValues: {
+      avatar: "",
+    },
+  });
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -143,7 +150,32 @@ const EditAvatar = () => {
             5MB）
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit((data) => console.log(data))}>
+            <FormField
+              control={form.control}
+              name="avatar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-primary">照片檔案</FormLabel>
+                  <FormControl>
+                    <Input type="file" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter className="sm:justify-end mt-3">
+              <DialogClose asChild>
+                <Button type="button" variant="secondary">
+                  取消
+                </Button>
+              </DialogClose>
+              <Button type="submit">儲存</Button>
+            </DialogFooter>
+          </form>
+        </Form>
+        {/* <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
               照片檔案
@@ -158,7 +190,7 @@ const EditAvatar = () => {
             </Button>
           </DialogClose>
           <Button type="submit">儲存</Button>
-        </DialogFooter>
+        </DialogFooter> */}
       </DialogContent>
     </Dialog>
   );
@@ -173,6 +205,15 @@ const EditBasicInfo = ({
   selfIntroduction: string;
   personalTags: string[];
 }) => {
+  const form = useForm<z.infer<typeof basicInfoSchema>>({
+    resolver: zodResolver(basicInfoSchema),
+    defaultValues: {
+      userName,
+      selfIntroduction,
+      tag: "",
+    },
+  });
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -190,9 +231,87 @@ const EditBasicInfo = ({
             <DialogContent className="sm:max-w-[425px] md:max-w-[600px]">
               <DialogHeader>
                 <DialogTitle>編輯個人資料</DialogTitle>
-                <DialogDescription></DialogDescription>
+                <DialogDescription>
+                  修改姓名、新增自我介紹內容
+                </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit((data) => console.log(data))}>
+                  <FormField
+                    control={form.control}
+                    name="userName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-primary">姓名</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="請輸入姓名"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="selfIntroduction"
+                    render={({ field }) => (
+                      <FormItem className="mt-3">
+                        <FormLabel className="text-primary">
+                          自我介紹(500字以內)
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="寫點什麼吧！讓大家快速認識你：）"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="tag"
+                    render={({ field }) => (
+                      <FormItem className="mt-3">
+                        <FormLabel className="text-primary">個人標籤</FormLabel>
+                        <FormControl>
+                          <div className="flex gap-2">
+                            <Input type="text" placeholder="新增標籤" {...field} />
+                            <Button size="icon" variant="outline">
+                              <FontAwesomeIcon icon={faPlus} />
+                            </Button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {personalTags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="text-sm rounded-sm shadow-sm text-neutral-100"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                  <DialogFooter className="sm:justify-end">
+                    <DialogClose asChild>
+                      <Button type="button" variant="secondary">
+                        取消
+                      </Button>
+                    </DialogClose>
+                    <Button type="submit">儲存</Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+              {/* <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-start gap-4">
                   <Label htmlFor="name" className="text-right">
                     姓名
@@ -245,15 +364,7 @@ const EditBasicInfo = ({
                     </Badge>
                   ))}
                 </div>
-              </div>
-              <DialogFooter className="sm:justify-end">
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    取消
-                  </Button>
-                </DialogClose>
-                <Button type="submit">儲存</Button>
-              </DialogFooter>
+              </div> */}
             </DialogContent>
           </Dialog>
         </TooltipTrigger>
