@@ -38,6 +38,7 @@ import {
   faCamera,
   faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
+import { X } from "lucide-react";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,8 +54,8 @@ const avatarSchema = z.object({
 
 const basicInfoSchema = z.object({
   userName: z.string().min(2).max(100),
-  selfIntroduction: z.string().min(1).max(500),
-  tag: z.string().min(1).max(10),
+  selfIntroduction: z.string().max(500),
+  tag: z.string().max(10),
 });
 
 const EditCoverPhoto = () => {
@@ -110,14 +111,6 @@ const EditCoverPhoto = () => {
             </DialogFooter>
           </form>
         </Form>
-        {/* <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              照片檔案
-            </Label>
-            <Input id="name" type="file" className="col-span-3" />
-          </div>
-        </div> */}
       </DialogContent>
     </Dialog>
   );
@@ -175,22 +168,6 @@ const EditAvatar = () => {
             </DialogFooter>
           </form>
         </Form>
-        {/* <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              照片檔案
-            </Label>
-            <Input id="name" type="file" className="col-span-3" />
-          </div>
-        </div>
-        <DialogFooter className="sm:justify-end">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              取消
-            </Button>
-          </DialogClose>
-          <Button type="submit">儲存</Button>
-        </DialogFooter> */}
       </DialogContent>
     </Dialog>
   );
@@ -205,6 +182,8 @@ const EditBasicInfo = ({
   selfIntroduction: string;
   personalTags: string[];
 }) => {
+  const [tempTags, setTempTags] = useState<string[]>([...personalTags]);
+
   const form = useForm<z.infer<typeof basicInfoSchema>>({
     resolver: zodResolver(basicInfoSchema),
     defaultValues: {
@@ -214,11 +193,37 @@ const EditBasicInfo = ({
     },
   });
 
+  const handleAddTag = () => {
+    if (form.getValues("tag") === "") {
+      return;
+    }
+    setTempTags([...tempTags, form.getValues("tag")]);
+    // form.setValue("tag", "");
+    form.reset();
+    form.clearErrors();
+  };
+
+  const handleDeleteTag = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+    setTempTags(tempTags.filter((t) => t !== (e.target as SVGElement).id));
+  };
+
+  const onSubmit = (data: z.infer<typeof basicInfoSchema>) => {
+
+    console.log(data);
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Dialog>
+          <Dialog
+            onOpenChange={(open) => {
+              if (!open) {
+                form.reset();
+                setTempTags([...personalTags]);
+              }
+            }}
+          >
             <DialogTrigger asChild>
               <Button
                 className="absolute right-2 bottom-2"
@@ -236,7 +241,7 @@ const EditBasicInfo = ({
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit((data) => console.log(data))}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
                   <FormField
                     control={form.control}
                     name="userName"
@@ -280,8 +285,17 @@ const EditBasicInfo = ({
                         <FormLabel className="text-primary">個人標籤</FormLabel>
                         <FormControl>
                           <div className="flex gap-2">
-                            <Input type="text" placeholder="新增標籤" {...field} />
-                            <Button size="icon" variant="outline">
+                            <Input
+                              type="text"
+                              placeholder="新增標籤"
+                              {...field}
+                            />
+                            <Button
+                              size="icon"
+                              type="button"
+                              variant="outline"
+                              onClick={handleAddTag}
+                            >
                               <FontAwesomeIcon icon={faPlus} />
                             </Button>
                           </div>
@@ -291,19 +305,28 @@ const EditBasicInfo = ({
                     )}
                   />
                   <div className="flex flex-wrap gap-2 mt-3">
-                    {personalTags.map((tag) => (
+                    {tempTags.map((tag) => (
                       <Badge
                         key={tag}
                         variant="secondary"
                         className="text-sm rounded-sm shadow-sm text-neutral-100"
                       >
                         {tag}
+                        <X
+                          className="cursor-pointer"
+                          id={tag}
+                          onClick={handleDeleteTag}
+                        />
                       </Badge>
                     ))}
                   </div>
-                  <DialogFooter className="sm:justify-end">
+                  <DialogFooter className="sm:justify-end mt-6">
+                    {/* set tempTags to personalTags when close dialog */}
                     <DialogClose asChild>
-                      <Button type="button" variant="secondary">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                      >
                         取消
                       </Button>
                     </DialogClose>
@@ -311,60 +334,6 @@ const EditBasicInfo = ({
                   </DialogFooter>
                 </form>
               </Form>
-              {/* <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-start gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    姓名
-                  </Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="請輸入姓名"
-                    defaultValue={userName}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-start gap-4">
-                  <Label htmlFor="self-intro" className="text-right">
-                    自我介紹(500字以內)
-                  </Label>
-                  <Textarea
-                    id="self-intro"
-                    name="selfIntro"
-                    placeholder="寫點什麼吧！讓大家快速認識你：）"
-                    defaultValue={selfIntroduction}
-                    className="col-span-3"
-                  />
-                </div>
-
-                <div className="grid grid-cols-5 items-start gap-4">
-                  <Label htmlFor="tags" className="text-right">
-                    個人標籤
-                  </Label>
-                  <Input
-                    id="tags"
-                    name="tags"
-                    type="text"
-                    placeholder="新增標籤"
-                    className="col-span-3"
-                  />
-                  <Button size="icon">
-                    <FontAwesomeIcon icon={faPlus} />
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {personalTags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className="text-sm rounded-sm shadow-sm text-neutral-100"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div> */}
             </DialogContent>
           </Dialog>
         </TooltipTrigger>

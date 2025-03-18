@@ -166,7 +166,7 @@ const Profile = async () => {
           </div>
         </CardHeader>
         <CardContent>
-          <p>{selfIntroduction}</p>
+          <p className="text-sm">{selfIntroduction || `Hi~ 我是${userName}，期待在這裡和大家一起享受運動樂趣！`}</p>
         </CardContent>
         <CardFooter className="">
           {/* tags here */}
