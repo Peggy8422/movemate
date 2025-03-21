@@ -55,7 +55,7 @@ export default function RootLayout({
               {/* nav-header */}
               <NavHeader />
               {/* <SidebarTrigger /> */}
-              <div className="w-full">{children}</div>
+              <div className="w-full h-full overflow-y-auto">{children}</div>
               <SocialListComp></SocialListComp>
             </main>
           </SidebarProvider>

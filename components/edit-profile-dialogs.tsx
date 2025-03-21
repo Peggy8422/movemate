@@ -198,7 +198,6 @@ const EditBasicInfo = ({
       return;
     }
     setTempTags([...tempTags, form.getValues("tag")]);
-    // form.setValue("tag", "");
     form.reset();
     form.clearErrors();
   };
@@ -208,8 +207,12 @@ const EditBasicInfo = ({
   };
 
   const onSubmit = (data: z.infer<typeof basicInfoSchema>) => {
-
-    console.log(data);
+    const updatedData = {
+      userName: data.userName,
+      selfIntroduction: data.selfIntroduction,
+      personalTags: [...tempTags],
+    };
+    console.log(updatedData);
   };
 
   return (
@@ -323,10 +326,7 @@ const EditBasicInfo = ({
                   <DialogFooter className="sm:justify-end mt-6">
                     {/* set tempTags to personalTags when close dialog */}
                     <DialogClose asChild>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                      >
+                      <Button type="button" variant="secondary">
                         取消
                       </Button>
                     </DialogClose>

@@ -50,7 +50,7 @@ const SidebarComp = () => {
   return (
     <>
       {pathname !== "/preferance-flow" ? (
-        <Sidebar collapsible="icon">
+        <Sidebar collapsible="icon" className="z-50">
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupLabel className="font-baloo font-bold">

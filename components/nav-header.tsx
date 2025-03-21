@@ -64,7 +64,7 @@ const NavHeader = () => {
   }, []);
 
   return (
-    <div className="brand-header w-full pr-8 pl-3 py-4 flex items-center justify-between absolute top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900 z-50">
+    <div className="brand-header w-full pr-8 pl-3 py-4 flex items-center justify-between absolute top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900 z-40">
       <div className="flex items-center">
         {pathname !== "/preferance-flow" && (
           <SidebarTrigger className="text-primary" />

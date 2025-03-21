@@ -12,7 +12,6 @@ const LoginRedirectPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  console.log(token);
 
   useEffect(() => {
     if (token) {
