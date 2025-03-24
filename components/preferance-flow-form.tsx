@@ -27,6 +27,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2 } from "lucide-react";
 // import Link from "next/link";
 
 // import {
@@ -82,6 +83,7 @@ const questionNameMap: { [key: string]: string } = {
 
 const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -124,6 +126,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
   )?.RoadList;
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
     // sent to backend
     console.log(data);
     const payload = questions.map((question: Question) => ({
@@ -544,10 +547,12 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                   !form.formState.isValid ||
                   Object.values(form.control._formValues).some(
                     (value) => !value
-                  )
+                  ) ||
+                  isLoading
                 }
               >
-                完成
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? "送出中..." : "完成"}
               </Button>
             )}
           </div>

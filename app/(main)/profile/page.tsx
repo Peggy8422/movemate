@@ -56,6 +56,7 @@ const getProfileData = async () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token?.value}`,
       },
+      cache: "no-store",
     }
   );
   const { data } = await response.json();
@@ -73,8 +74,8 @@ const getProfileData = async () => {
   // return data;
   return {
     userName: userBasicInfo.name,
-    userAvatar: userBasicInfo.coverPhoto,
-    userCoverPhoto: userBasicInfo.coverPhoto,
+    userAvatar: userBasicInfo.coverPhoto || "/default_user_avatar_1.png",
+    userCoverPhoto: userBasicInfo.coverPhoto || "/default_user_cover.jpeg",
     userSexual: data?.find(
       (item: { questionTitle: string }) => item.questionTitle === "性別"
     )?.selections[0].selectionText,
@@ -140,7 +141,7 @@ const Profile = async () => {
         <EditCoverPhoto></EditCoverPhoto>
         <div className="absolute ml-5 -mt-10">
           <Image
-            className="border-4 border-white rounded-xl"
+            className="border-4 border-white rounded-xl bg-[#DEE6E8]"
             src={userAvatar}
             alt="Paofile Avatar"
             width={100}
@@ -217,6 +218,8 @@ const Profile = async () => {
               </Badge>
             )
           )}
+          {/* add new item */}
+          {}
         </div>
       </div>
       <div>
@@ -253,6 +256,8 @@ const Profile = async () => {
               </Badge>
             )
           )}
+          {/* add new item */}
+          {}
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-
+import React, { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -59,12 +59,18 @@ const basicInfoSchema = z.object({
 });
 
 const EditCoverPhoto = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof coverPhotoSchema>>({
     resolver: zodResolver(coverPhotoSchema),
     defaultValues: {
       coverPhoto: "",
     },
   });
+
+  const onSubmitCover = (data: z.infer<typeof coverPhotoSchema>) => {
+    console.log(data);
+    router.refresh();
+  };
 
   return (
     <Dialog>
@@ -83,11 +89,7 @@ const EditCoverPhoto = () => {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((data) => {
-              console.log(data);
-            })}
-          >
+          <form onSubmit={form.handleSubmit(onSubmitCover)}>
             <FormField
               control={form.control}
               name="coverPhoto"
@@ -117,12 +119,18 @@ const EditCoverPhoto = () => {
 };
 
 const EditAvatar = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof avatarSchema>>({
     resolver: zodResolver(avatarSchema),
     defaultValues: {
       avatar: "",
     },
   });
+
+  const onSubmitAvatar = (data: z.infer<typeof avatarSchema>) => {
+    console.log(data);
+    router.refresh();
+  };
 
   return (
     <Dialog>
@@ -144,7 +152,7 @@ const EditAvatar = () => {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((data) => console.log(data))}>
+          <form onSubmit={form.handleSubmit(onSubmitAvatar)}>
             <FormField
               control={form.control}
               name="avatar"
@@ -164,6 +172,7 @@ const EditAvatar = () => {
                   取消
                 </Button>
               </DialogClose>
+              <DialogClose asChild></DialogClose>
               <Button type="submit">儲存</Button>
             </DialogFooter>
           </form>
@@ -182,6 +191,9 @@ const EditBasicInfo = ({
   selfIntroduction: string;
   personalTags: string[];
 }) => {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  // const [localDialogOpen, setLocalDialogOpen] = useState(false);
   const [tempTags, setTempTags] = useState<string[]>([...personalTags]);
 
   const form = useForm<z.infer<typeof basicInfoSchema>>({
@@ -213,6 +225,10 @@ const EditBasicInfo = ({
       personalTags: [...tempTags],
     };
     console.log(updatedData);
+
+    startTransition(() => {
+      router.refresh();
+    });
   };
 
   return (
@@ -330,7 +346,9 @@ const EditBasicInfo = ({
                         取消
                       </Button>
                     </DialogClose>
-                    <Button type="submit">儲存</Button>
+                    <DialogClose asChild>
+                      <Button type="submit" disabled={!form.formState.isValid || isPending}>儲存</Button>
+                    </DialogClose>
                   </DialogFooter>
                 </form>
               </Form>
