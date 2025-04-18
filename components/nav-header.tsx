@@ -43,15 +43,11 @@ interface User {
   exp: number;
 }
 
-
 const NavHeader = () => {
-  
-  
   const [user, setUser] = useState<User | null>(null);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
-
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -94,7 +90,9 @@ const NavHeader = () => {
             <div className="relative">
               <Avatar className="cursor-pointer border-2 border-secondary">
                 {/* fetch avatar */}
-                <AvatarImage src={user?.coverPhoto || "/default_user_avatar_1.png"} />
+                <AvatarImage
+                  src={user?.coverPhoto || "/default_user_avatar_1.png"}
+                />
                 {/* Fallback: username */}
                 <AvatarFallback>{user?.name}</AvatarFallback>
               </Avatar>
@@ -105,7 +103,10 @@ const NavHeader = () => {
             <DropdownMenuLabel>我的帳戶</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem disabled={pathname === "/preferance-flow"}>
+              <DropdownMenuItem
+                disabled={pathname === "/preferance-flow"}
+                onClick={() => router.push("/profile")}
+              >
                 個人頁面設定
               </DropdownMenuItem>
               <DropdownMenuItem
