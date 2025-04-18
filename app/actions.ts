@@ -1,7 +1,7 @@
 "use server";
 import { cookies } from "next/headers";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_DEV_BASE_URL;
 
 // cookies actions
 export async function setCookie(key: string, value: string) {
@@ -78,13 +78,9 @@ export async function forgetPassword(userEmail: string) {
     console.log(error);
     throw new Error("Something went wrong");
   }
-  
 }
 
-export async function resetPassword(
-  newPassword: string,
-  token: string
-) {
+export async function resetPassword(newPassword: string, token: string) {
   try {
     const res = await fetch(`${BASE_URL}/auth/reset-password`, {
       method: "POST",
@@ -103,3 +99,93 @@ export async function resetPassword(
     throw new Error("Something went wrong");
   }
 }
+
+// update profile: user info/ preferance
+export async function updateUserAvatar(avatarFile: File, token: string) {
+  const formData = new FormData();
+  formData.append("avatar", avatarFile);
+  try {
+    const res = await fetch(`${BASE_URL}/profile/uploadProfilePicture`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went wrong");
+  }
+}
+
+export async function updateProfileCover(coverFile: File, token: string) {
+  const formData = new FormData();
+  formData.append("cover", coverFile);
+  try {
+    const res = await fetch(`${BASE_URL}/profile/uploadCoverPicture`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went wrong");
+  }
+}
+
+export async function updateUserInfo(
+  userData: {
+    name: string;
+    intro: string;
+    personalTags: string[];
+  },
+  token: string
+) {
+  try {
+    const res = await fetch(`${BASE_URL}/profile/savePersonalProfile`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(userData),
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went wrong");
+  }
+}
+
+// payload structure same as preferance-flow
+export async function updatePreferance(
+  preferanceData: object[],
+  token: string
+) {
+  try {
+    const res = await fetch(`${BASE_URL}/user/update-preferance`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(preferanceData),
+    });
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Something went wrong");
+  }
+}
+
+export async function saveOtherFlowAnswer() {}
