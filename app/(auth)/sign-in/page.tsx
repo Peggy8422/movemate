@@ -215,6 +215,7 @@ const SignIn = () => {
                             <Input
                               className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
                               type="email"
+                              autoComplete="username"
                               placeholder="請輸入註冊時的帳戶(電子信箱)"
                               {...field}
                             />
@@ -233,6 +234,7 @@ const SignIn = () => {
                             <Input
                               className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
                               type="password"
+                              autoComplete="current-password"
                               placeholder="請輸入註冊時的密碼"
                               {...field}
                             />

@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+// import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { Loader2 } from "lucide-react";
 
 import Link from "next/link";
@@ -38,11 +38,13 @@ const formSchema = z
   })
   .required();
 
-const SignUpForm = ({
-  setIsSignupSuccess,
-}: {
-  setIsSignupSuccess: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+const SignUpForm = (
+//   {
+//   setIsSignupSuccess,
+// }: {
+//   setIsSignupSuccess: React.Dispatch<React.SetStateAction<boolean>>;
+// }
+) => {
   const [isLoading, setIsLoading] = useState(false);
   // const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -89,9 +91,6 @@ const SignUpForm = ({
                 <FormControl>
                   <Input placeholder="（ex: 王）" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-              使用者姓氏必須介於 1 到 50 個字之間
-            </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -105,9 +104,6 @@ const SignUpForm = ({
                 <FormControl>
                   <Input placeholder="（ex: 小明）" {...field} />
                 </FormControl>
-                {/* <FormDescription>
-              使用者名字必須介於 1 到 50 個字之間
-            </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -122,13 +118,11 @@ const SignUpForm = ({
               <FormControl>
                 <Input
                   type="email"
+                  autoComplete="username"
                   placeholder="請使用電子信箱註冊（ex: test@example.com)"
                   {...field}
                 />
               </FormControl>
-              {/* <FormDescription>
-              使用者姓氏必須介於 1 到 50 個字之間
-            </FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -142,13 +136,11 @@ const SignUpForm = ({
               <FormControl>
                 <Input
                   type="password"
+                  autoComplete="new-password"
                   placeholder="請設定6~12位英文字母大小寫和數字混合的密碼"
                   {...field}
                 />
               </FormControl>
-              {/* <FormDescription>
-              使用者姓氏必須介於 1 到 50 個字之間
-            </FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -162,13 +154,11 @@ const SignUpForm = ({
               <FormControl>
                 <Input
                   type="password"
+                  autoComplete="new-password"
                   placeholder="請再次輸入密碼"
                   {...field}
                 />
               </FormControl>
-              {/* <FormDescription>
-              使用者姓氏必須介於 1 到 50 個字之間
-            </FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -203,7 +193,7 @@ const SignUpForm = ({
 };
 
 const SignUp = () => {
-  const [isSignupSuccess, setIsSignupSuccess] = useState(false);
+  // const [isSignupSuccess, setIsSignupSuccess] = useState(false);
   // if (isSignupSuccess) {
   //   setTimeout(() => {
   //     setIsSignupSuccess(false);
@@ -211,9 +201,9 @@ const SignUp = () => {
   // }
   return (
     <div className="h-full position-relative">
-      <SignUpForm setIsSignupSuccess={setIsSignupSuccess} />
+      <SignUpForm />
       {/* alert */}
-      {isSignupSuccess && (
+      {/* {isSignupSuccess && (
         <div className="absolute top-0 left-0 right-0 bottom-0 bg-[rgba(0,0,0,0.5)]">
           <Alert className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3">
             <FontAwesomeIcon
@@ -229,7 +219,7 @@ const SignUp = () => {
             </AlertDescription>
           </Alert>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

@@ -93,7 +93,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
     defaultValues: {
       height: null,
       weight: null,
-      sexual: "",
+      sexual: questions.find((q) => q.title === "性別")?.selections[0].id,
       age: null,
       city: "",
       district: "",
@@ -104,10 +104,6 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
       purpose: null,
     },
   });
-  form.setValue(
-    "sexual",
-    questions.find((q) => q.title === "性別")?.selections[0].id
-  );
 
   const districtOptions = taiwanCityDistrictRoads.find(
     (item: {
@@ -202,7 +198,11 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                             生理性別
                           </FormLabel>
                           <FormControl>
-                            <Tabs defaultValue={field.value} className="w-full">
+                            <Tabs
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              className="w-full"
+                            >
                               <TabsList className="bg-transparent w-full p-0">
                                 {question.selections.map(
                                   (item: { id: string; selection: string }) => (

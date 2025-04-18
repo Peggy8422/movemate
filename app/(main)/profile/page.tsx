@@ -187,6 +187,38 @@ const Profile = async () => {
       <div className="mb-6">
         <h3 className="font-bold text-primary flex items-center gap-3 mb-3">
           偏好的運動場所{" "}
+          {/* {preferance.place.length < 5 && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-md w-6 h-6 hover:bg-primary hover:text-neutral-50"
+                  >
+                    <FontAwesomeIcon icon={faPlus} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">新增常去的運動場所（至多5項）</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )} */}
+        </h3>
+        <div className="flex flex-wrap gap-3 ">
+          {preferance.place.map(
+            (p: { selectionId: string; selectionText: string }) => (
+              <Badge
+                key={p.selectionId}
+                variant="secondary"
+                className="text-sm rounded-sm shadow-sm text-neutral-100"
+              >
+                {p.selectionText}
+              </Badge>
+            )
+          )}
+          {/* add new item */}
           {preferance.place.length < 5 && (
             <TooltipProvider>
               <Tooltip>
@@ -205,21 +237,6 @@ const Profile = async () => {
               </Tooltip>
             </TooltipProvider>
           )}
-        </h3>
-        <div className="flex flex-wrap gap-3 ">
-          {preferance.place.map(
-            (p: { selectionId: string; selectionText: string }) => (
-              <Badge
-                key={p.selectionId}
-                variant="secondary"
-                className="text-sm rounded-sm shadow-sm text-neutral-100"
-              >
-                {p.selectionText}
-              </Badge>
-            )
-          )}
-          {/* add new item */}
-          {}
         </div>
       </div>
       <div>
