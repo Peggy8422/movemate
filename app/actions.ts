@@ -103,7 +103,7 @@ export async function resetPassword(newPassword: string, token: string) {
 // update profile: user info/ preferance
 export async function updateUserAvatar(avatarFile: File, token: string) {
   const formData = new FormData();
-  formData.append("avatar", avatarFile);
+  formData.append("file", avatarFile);
   try {
     const res = await fetch(`${BASE_URL}/profile/uploadProfilePicture`, {
       method: "PUT",
@@ -123,7 +123,7 @@ export async function updateUserAvatar(avatarFile: File, token: string) {
 
 export async function updateProfileCover(coverFile: File, token: string) {
   const formData = new FormData();
-  formData.append("cover", coverFile);
+  formData.append("file", coverFile);
   try {
     const res = await fetch(`${BASE_URL}/profile/uploadCoverPicture`, {
       method: "PUT",

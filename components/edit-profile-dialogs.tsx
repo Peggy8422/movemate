@@ -51,6 +51,8 @@ import {
   getCookie,
 } from "@/app/actions";
 
+const BASE_URL = process.env.NEXT_PUBLIC_DEV_BASE_URL;
+
 const coverPhotoSchema = z.object({
   coverPhoto: z
     .instanceof(FileList)
@@ -168,17 +170,45 @@ const EditAvatar = () => {
 
   const onSubmitAvatar = async (data: z.infer<typeof avatarSchema>) => {
     const token = await getCookie("token");
+    console.log(data.avatar[0]);
+    console.log(token?.value);
+    const formData = new FormData();
+    formData.append("file", data.avatar[0]);
+
     if (token?.value) {
-      const { message, path } = await updateUserAvatar(
-        data.avatar[0],
-        token.value
-      );
-      if (message === "Upload successful") {
-        console.log(path);
-        alert("大頭貼照上傳成功");
-        form.reset();
-        router.refresh();
+      try {
+        const res = await fetch(`${BASE_URL}/profile/uploadProfilePicture`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token.value}`,
+          },
+          body: formData,
+        });
+        const result = await res.json();
+        const { success, message } = result;
+        if (success) {
+          console.log(message);
+          alert("大頭貼照上傳成功");
+          form.reset();
+          router.refresh();
+        } else {
+          console.error("Upload failed:", message);
+        }
+      } catch (error) {
+        console.error("Error uploading avatar:", error);
       }
+
+      // const { message, path } = await updateUserAvatar(
+      //   data.avatar[0],
+      //   token.value
+      // );
+      // if (message === "Upload successful") {
+      //   console.log(path);
+      //   alert("大頭貼照上傳成功");
+      //   form.reset();
+      //   router.refresh();
+      // }
     } else {
       console.error("Token is undefined");
     }
