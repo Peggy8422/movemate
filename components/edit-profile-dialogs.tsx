@@ -44,12 +44,23 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
+import {
+  updateProfileCover,
+  updateUserAvatar,
+  updateUserInfo,
+  getCookie,
+} from "@/app/actions";
+
 const coverPhotoSchema = z.object({
-  coverPhoto: z.string().url(),
+  coverPhoto: z
+    .instanceof(FileList)
+    .refine((file) => file?.length == 1, "File is required."),
 });
 
 const avatarSchema = z.object({
-  avatar: z.string().url(),
+  avatar: z
+    .instanceof(FileList)
+    .refine((file) => file?.length == 1, "File is required."),
 });
 
 const basicInfoSchema = z.object({
@@ -63,13 +74,31 @@ const EditCoverPhoto = () => {
   const form = useForm<z.infer<typeof coverPhotoSchema>>({
     resolver: zodResolver(coverPhotoSchema),
     defaultValues: {
-      coverPhoto: "",
+      coverPhoto: undefined,
     },
   });
 
-  const onSubmitCover = (data: z.infer<typeof coverPhotoSchema>) => {
-    console.log(data);
-    router.refresh();
+  const coverPhotoRef = form.register("coverPhoto");
+
+  const onSubmitCover = async (data: z.infer<typeof coverPhotoSchema>) => {
+    const token = await getCookie("token");
+
+    // console.log(data);
+    if (token?.value) {
+      const { message, path } = await updateProfileCover(
+        data.coverPhoto[0],
+        token.value
+      );
+      console.log(message);
+      if (message === "Upload successful") {
+        console.log(path);
+        alert("封面照上傳成功");
+        form.reset();
+        router.refresh();
+      }
+    } else {
+      console.error("Token is undefined");
+    }
   };
 
   return (
@@ -97,7 +126,13 @@ const EditCoverPhoto = () => {
                 <FormItem>
                   <FormLabel className="text-primary">照片檔案</FormLabel>
                   <FormControl>
-                    <Input type="file" {...field} />
+                    <Input
+                      type="file"
+                      {...coverPhotoRef}
+                      onChange={(event) => {
+                        field.onChange(event.target?.files ?? undefined);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -109,7 +144,9 @@ const EditCoverPhoto = () => {
                   取消
                 </Button>
               </DialogClose>
-              <Button type="submit">儲存</Button>
+              <DialogClose asChild>
+                <Button type="submit">儲存</Button>
+              </DialogClose>
             </DialogFooter>
           </form>
         </Form>
@@ -123,13 +160,28 @@ const EditAvatar = () => {
   const form = useForm<z.infer<typeof avatarSchema>>({
     resolver: zodResolver(avatarSchema),
     defaultValues: {
-      avatar: "",
+      avatar: undefined,
     },
   });
 
-  const onSubmitAvatar = (data: z.infer<typeof avatarSchema>) => {
-    console.log(data);
-    router.refresh();
+  const avatarRef = form.register("avatar");
+
+  const onSubmitAvatar = async (data: z.infer<typeof avatarSchema>) => {
+    const token = await getCookie("token");
+    if (token?.value) {
+      const { message, path } = await updateUserAvatar(
+        data.avatar[0],
+        token.value
+      );
+      if (message === "Upload successful") {
+        console.log(path);
+        alert("大頭貼照上傳成功");
+        form.reset();
+        router.refresh();
+      }
+    } else {
+      console.error("Token is undefined");
+    }
   };
 
   return (
@@ -160,7 +212,13 @@ const EditAvatar = () => {
                 <FormItem>
                   <FormLabel className="text-primary">照片檔案</FormLabel>
                   <FormControl>
-                    <Input type="file" {...field} />
+                    <Input
+                      type="file"
+                      {...avatarRef}
+                      onChange={(event) => {
+                        field.onChange(event.target?.files ?? undefined);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -172,8 +230,9 @@ const EditAvatar = () => {
                   取消
                 </Button>
               </DialogClose>
-              <DialogClose asChild></DialogClose>
-              <Button type="submit">儲存</Button>
+              <DialogClose asChild>
+                <Button type="submit">儲存</Button>
+              </DialogClose>
             </DialogFooter>
           </form>
         </Form>
@@ -218,13 +277,21 @@ const EditBasicInfo = ({
     setTempTags(tempTags.filter((t) => t !== (e.target as SVGElement).id));
   };
 
-  const onSubmit = (data: z.infer<typeof basicInfoSchema>) => {
+  const onSubmit = async (data: z.infer<typeof basicInfoSchema>) => {
+    const token = await getCookie("token");
     const updatedData = {
-      userName: data.userName,
-      selfIntroduction: data.selfIntroduction,
+      name: data.userName,
+      intro: data.selfIntroduction,
       personalTags: [...tempTags],
     };
     console.log(updatedData);
+
+    if (token?.value === undefined) {
+      console.error("Token is undefined");
+      return;
+    }
+    const userData = await updateUserInfo(updatedData, token?.value || "");
+    console.log(userData);
 
     startTransition(() => {
       router.refresh();
@@ -347,7 +414,12 @@ const EditBasicInfo = ({
                       </Button>
                     </DialogClose>
                     <DialogClose asChild>
-                      <Button type="submit" disabled={!form.formState.isValid || isPending}>儲存</Button>
+                      <Button
+                        type="submit"
+                        disabled={!form.formState.isValid || isPending}
+                      >
+                        儲存
+                      </Button>
                     </DialogClose>
                   </DialogFooter>
                 </form>

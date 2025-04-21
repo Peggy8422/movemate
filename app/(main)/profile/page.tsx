@@ -14,9 +14,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-// import { Input } from "@/components/ui/input";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 // import { Textarea } from "@/components/ui/textarea";
-// import { Label } from "@/components/ui/label";
 // import {
 //   Dialog,
 //   DialogContent,
@@ -49,7 +55,7 @@ const getProfileData = async () => {
   const token = await getCookie("token");
   const userData = await getCookie("user");
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/flow/getFlowAnswer`,
+    `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/flow/getFlowAnswer`,
     {
       method: "GET",
       headers: {
@@ -167,7 +173,10 @@ const Profile = async () => {
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm">{selfIntroduction || `Hi~ 我是${userName}，期待在這裡和大家一起享受運動樂趣！`}</p>
+          <p className="text-sm">
+            {selfIntroduction ||
+              `Hi~ 我是${userName}，期待在這裡和大家一起享受運動樂趣！`}
+          </p>
         </CardContent>
         <CardFooter className="">
           {/* tags here */}
@@ -219,18 +228,35 @@ const Profile = async () => {
             )
           )}
           {/* add new item */}
+          {/* popover */}
           {preferance.place.length < 5 && (
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-md w-6 h-6 hover:bg-primary hover:text-neutral-50"
-                  >
-                    <FontAwesomeIcon icon={faPlus} />
-                  </Button>
-                </TooltipTrigger>
+                <Popover>
+                  <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="rounded-md w-6 h-6 hover:bg-primary hover:text-neutral-50"
+                      >
+                        <FontAwesomeIcon icon={faPlus} />
+                      </Button>
+                    </PopoverTrigger>
+                  </TooltipTrigger>
+                  <PopoverContent className="w-80">
+                    <div className="grid gap-4">
+                      <div className="grid grid-cols-3 items-center gap-4">
+                        <Label htmlFor="width">運動場所</Label>
+                        <Input
+                          id="width"
+                          defaultValue=""
+                          className="col-span-2 h-8"
+                        />
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 <TooltipContent>
                   <p className="text-xs">新增常去的運動場所（至多5項）</p>
                 </TooltipContent>

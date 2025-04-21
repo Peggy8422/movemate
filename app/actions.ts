@@ -167,25 +167,25 @@ export async function updateUserInfo(
 }
 
 // payload structure same as preferance-flow
-export async function updatePreferance(
-  preferanceData: object[],
-  token: string
-) {
-  try {
-    const res = await fetch(`${BASE_URL}/user/update-preferance`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(preferanceData),
-    });
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw new Error("Something went wrong");
-  }
-}
+// export async function updatePreferance(
+//   preferanceData: object[],
+//   token: string
+// ) {
+//   try {
+//     const res = await fetch(`${BASE_URL}/user/update-preferance`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//       body: JSON.stringify(preferanceData),
+//     });
+//     const data = await res.json();
+//     return data;
+//   } catch (error) {
+//     console.log(error);
+//     throw new Error("Something went wrong");
+//   }
+// }
 
 export async function saveOtherFlowAnswer() {}
