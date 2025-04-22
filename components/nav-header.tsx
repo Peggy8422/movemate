@@ -38,6 +38,7 @@ interface User {
   facebookId?: string;
   lineId?: string;
   coverPhoto: string;
+  profiflePic: string;
   isFilledOutDoc: boolean;
   iat: number;
   exp: number;
@@ -91,7 +92,8 @@ const NavHeader = () => {
               <Avatar className="cursor-pointer border-2 border-secondary">
                 {/* fetch avatar */}
                 <AvatarImage
-                  src={user?.coverPhoto || "/default_user_avatar_1.png"}
+                  crossOrigin="anonymous"
+                  src={user?.profilePic || "/default_user_avatar_1.png"}
                 />
                 {/* Fallback: username */}
                 <AvatarFallback>{user?.name}</AvatarFallback>

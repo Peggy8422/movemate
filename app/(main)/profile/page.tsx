@@ -67,13 +67,6 @@ const getProfileData = async () => {
   const { data } = await response.json();
   const userBasicInfo = data.profile;
   const userAnswers = data.answers;
-  console.log("Data:", data);
-  // const userData = await getCookie("user");
-  // if (userData) {
-  //   const user = JSON.parse(userData.value);
-  //   user.coverPhoto = userBasicInfo.profilePic;
-  //   await setCookie("user", JSON.stringify(user));
-  // }
 
   return {
     userName: userBasicInfo.name,

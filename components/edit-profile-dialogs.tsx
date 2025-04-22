@@ -44,11 +44,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import {
-  updateUserInfo,
-  getCookie,
-  // setCookie,
-} from "@/app/actions";
+import { updateUserInfo, getCookie, setCookie } from "@/app/actions";
+import { jwtDecode } from "jwt-decode";
+import { UserAuth } from "@/types/user";
 
 const BASE_URL = process.env.NEXT_PUBLIC_DEV_BASE_URL;
 
@@ -205,11 +203,21 @@ const EditAvatar = () => {
           body: formData,
         });
         const result = await res.json();
-        const { success, message } = result;
+        console.log("updated avatar:", result);
+        const { success, message, data: userDataToken } = result;
         if (success) {
           console.log(message);
           alert("大頭貼照上傳成功");
           form.reset();
+          const decodedToken = jwtDecode<UserAuth>(userDataToken);
+          await setCookie("user", JSON.stringify(decodedToken));
+          // const userData = await getCookie("user");
+          // if (userData) {
+          //   const user = JSON.parse(userData.value);
+          //   user.coverPhoto = userBasicInfo.profilePic;
+          //   await setCookie("user", JSON.stringify(user));
+          // }
+
           router.refresh();
         } else {
           console.error("Upload failed:", message);
