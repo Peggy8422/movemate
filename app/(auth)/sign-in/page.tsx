@@ -347,13 +347,13 @@ const SignIn = () => {
             帳號登入
           </Button> */}
           <Button asChild>
-            <Link href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`}>
+            <Link href={`${process.env.NEXT_PUBLIC_DEV_BASE_URL}/auth/google`}>
               <GoogleLogo width={30} height={30} className="w-6 h-6" />以 Google
               帳號登入
             </Link>
           </Button>
           <Button asChild>
-            <Link href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/line`}>
+            <Link href={`${process.env.NEXT_PUBLIC_DEV_BASE_URL}/auth/line`}>
               <LineLogo width={30} height={30} className="w-6 h-6" />以 Line
               帳號登入
             </Link>

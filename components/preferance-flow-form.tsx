@@ -146,7 +146,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
 
     const token = await getCookie("token");
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/flow/saveFlowAnswer`,
+      `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/flow/saveFlowAnswer`,
       {
         method: "POST",
         headers: {
@@ -264,6 +264,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                     />
                   )
                 )}
+                
             </div>
           )}
           {/* map questions: not basic */}
