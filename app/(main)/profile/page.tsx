@@ -53,61 +53,63 @@ import {
 
 const getProfileData = async () => {
   const token = await getCookie("token");
-  const userData = await getCookie("user");
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/flow/getFlowAnswer`,
+    `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/profile/getPersonalPorfile`,
     {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
+        // "Content-Type": "application/json",
         Authorization: `Bearer ${token?.value}`,
       },
       cache: "no-store",
     }
   );
   const { data } = await response.json();
-  let userBasicInfo;
-  console.log(data);
-  if (userData?.value) {
-    userBasicInfo = JSON.parse(userData.value);
-  }
-  console.log("User Info: ", userBasicInfo);
-  console.log(
-    "Token Expired: ",
-    userBasicInfo.exp < Date.now() - userBasicInfo.iat
-  );
+  const userBasicInfo = data.profile;
+  const userAnswers = data.answers;
+  console.log("Data:", data);
+  // const userData = await getCookie("user");
+  // if (userData) {
+  //   const user = JSON.parse(userData.value);
+  //   user.coverPhoto = userBasicInfo.profilePic;
+  //   await setCookie("user", JSON.stringify(user));
+  // }
 
-  // return data;
   return {
     userName: userBasicInfo.name,
-    userAvatar: userBasicInfo.coverPhoto || "/default_user_avatar_1.png",
+    userAvatar: userBasicInfo.profilePic || "/default_user_avatar_1.png",
     userCoverPhoto: userBasicInfo.coverPhoto || "/default_user_cover.jpeg",
-    userSexual: data?.find(
+    userSexual: userAnswers?.find(
       (item: { questionTitle: string }) => item.questionTitle === "性別"
     )?.selections[0].selectionText,
-    userAge: data?.find(
+    userAge: userAnswers?.find(
       (item: { questionTitle: string }) => item.questionTitle === "年齡"
-    )?.textAnswer,
-    userHeight: data?.find(
+    )?.textAnswers,
+    userHeight: userAnswers?.find(
       (item: { questionTitle: string }) => item.questionTitle === "身高"
-    )?.textAnswer,
-    userWeight: data?.find(
+    )?.textAnswers,
+    userWeight: userAnswers?.find(
       (item: { questionTitle: string }) => item.questionTitle === "體重"
-    )?.textAnswer,
-    livingArea: data
+    )?.textAnswers,
+    livingArea: userAnswers
       ?.find(
         (item: { questionTitle: string }) => item.questionTitle === "住哪?"
       )
-      ?.textAnswer.slice(0, 3),
+      ?.textAnswers[0]?.slice(0, 3),
     userLevel: "1",
-    selfIntroduction: "",
-    personalTags: ["喜歡動物", "喜歡旅遊", "喜歡美食", "喜歡運動"],
+    selfIntroduction: userBasicInfo.intro || "",
+    personalTags: userBasicInfo.personalTags || [
+      "喜歡動物",
+      "喜歡旅遊",
+      "喜歡美食",
+      "喜歡運動",
+    ],
     preferance: {
-      place: data?.find(
+      place: userAnswers?.find(
         (item: { questionTitle: string }) =>
           item.questionTitle === "最常在哪裡運動？"
       ).selections,
-      sportType: data?.find(
+      sportType: userAnswers?.find(
         (item: { questionTitle: string }) =>
           item.questionTitle === "喜歡的運動種類？"
       ).selections,
@@ -147,7 +149,7 @@ const Profile = async () => {
         <EditCoverPhoto></EditCoverPhoto>
         <div className="absolute ml-5 -mt-10">
           <Image
-            className="border-4 border-white rounded-xl bg-[#DEE6E8]"
+            className="border-4 border-white rounded-xl bg-[#DEE6E8] w-[100px] h-[100px] object-cover"
             src={userAvatar}
             alt="Paofile Avatar"
             width={100}
@@ -181,7 +183,7 @@ const Profile = async () => {
         <CardFooter className="">
           {/* tags here */}
           <div className="flex flex-wrap gap-2">
-            {personalTags.map((tag) => (
+            {personalTags.map((tag: string) => (
               <Badge key={tag}>#{tag}</Badge>
             ))}
           </div>
@@ -195,25 +197,7 @@ const Profile = async () => {
       <Separator className="my-4" />
       <div className="mb-6">
         <h3 className="font-bold text-primary flex items-center gap-3 mb-3">
-          偏好的運動場所{" "}
-          {/* {preferance.place.length < 5 && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-md w-6 h-6 hover:bg-primary hover:text-neutral-50"
-                  >
-                    <FontAwesomeIcon icon={faPlus} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">新增常去的運動場所（至多5項）</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )} */}
+          偏好的運動場所
         </h3>
         <div className="flex flex-wrap gap-3 ">
           {preferance.place.map(
@@ -253,6 +237,7 @@ const Profile = async () => {
                           defaultValue=""
                           className="col-span-2 h-8"
                         />
+                        <Button className="w-20 h-8">新增</Button>
                       </div>
                     </div>
                   </PopoverContent>
@@ -267,25 +252,7 @@ const Profile = async () => {
       </div>
       <div>
         <h3 className="font-bold text-primary flex items-center gap-3 mb-3">
-          喜歡的運動種類/項目{" "}
-          {preferance.sportType.length < 5 && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-md w-6 h-6 hover:bg-primary hover:text-neutral-50"
-                  >
-                    <FontAwesomeIcon icon={faPlus} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-xs">新增運動種類/項目（至多5項）</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
+          喜歡的運動種類/項目
         </h3>
         <div className="flex flex-wrap gap-3 ">
           {preferance.sportType.map(
@@ -300,7 +267,41 @@ const Profile = async () => {
             )
           )}
           {/* add new item */}
-          {}
+          {preferance.sportType.length < 5 && (
+            <TooltipProvider>
+              <Tooltip>
+                <Popover>
+                  <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="rounded-md w-6 h-6 hover:bg-primary hover:text-neutral-50"
+                      >
+                        <FontAwesomeIcon icon={faPlus} />
+                      </Button>
+                    </PopoverTrigger>
+                  </TooltipTrigger>
+                  <PopoverContent className="w-80">
+                    <div className="grid gap-4">
+                      <div className="grid grid-cols-3 items-center gap-4">
+                        <Label htmlFor="width">運動項目</Label>
+                        <Input
+                          id="width"
+                          defaultValue=""
+                          className="col-span-2 h-8"
+                        />
+                        <Button className="w-20 h-8">新增</Button>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                <TooltipContent>
+                  <p className="text-xs">新增運動種類/項目（至多5項）</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </div>
     </div>

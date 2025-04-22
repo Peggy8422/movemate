@@ -101,46 +101,6 @@ export async function resetPassword(newPassword: string, token: string) {
 }
 
 // update profile: user info/ preferance
-export async function updateUserAvatar(avatarFile: File, token: string) {
-  const formData = new FormData();
-  formData.append("file", avatarFile);
-  try {
-    const res = await fetch(`${BASE_URL}/profile/uploadProfilePicture`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw new Error("Something went wrong");
-  }
-}
-
-export async function updateProfileCover(coverFile: File, token: string) {
-  const formData = new FormData();
-  formData.append("file", coverFile);
-  try {
-    const res = await fetch(`${BASE_URL}/profile/uploadCoverPicture`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw new Error("Something went wrong");
-  }
-}
-
 export async function updateUserInfo(
   userData: {
     name: string;

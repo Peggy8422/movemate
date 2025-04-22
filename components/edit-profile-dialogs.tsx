@@ -45,10 +45,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import {
-  updateProfileCover,
-  updateUserAvatar,
   updateUserInfo,
   getCookie,
+  // setCookie,
 } from "@/app/actions";
 
 const BASE_URL = process.env.NEXT_PUBLIC_DEV_BASE_URL;
@@ -84,20 +83,43 @@ const EditCoverPhoto = () => {
 
   const onSubmitCover = async (data: z.infer<typeof coverPhotoSchema>) => {
     const token = await getCookie("token");
+    const formData = new FormData();
+    formData.append("file", data.coverPhoto[0]);
 
-    // console.log(data);
     if (token?.value) {
-      const { message, path } = await updateProfileCover(
-        data.coverPhoto[0],
-        token.value
-      );
-      console.log(message);
-      if (message === "Upload successful") {
-        console.log(path);
-        alert("封面照上傳成功");
-        form.reset();
-        router.refresh();
+      try {
+        const res = await fetch(`${BASE_URL}/profile/uploadCoverPicture`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+          },
+          body: formData,
+        });
+        const result = await res.json();
+        const { success, message } = result;
+        if (success) {
+          console.log(message);
+          alert("封面照上傳成功");
+          form.reset();
+          router.refresh();
+        } else {
+          console.error("Upload failed:", message);
+        }
+      } catch (error) {
+        console.error("Error uploading cover photo:", error);
       }
+
+      // const { message, path } = await updateProfileCover(
+      //   data.coverPhoto[0],
+      //   token.value
+      // );
+      // console.log(message);
+      // if (message === "Upload successful") {
+      //   console.log(path);
+      //   alert("封面照上傳成功");
+      //   form.reset();
+      //   router.refresh();
+      // }
     } else {
       console.error("Token is undefined");
     }
@@ -170,8 +192,6 @@ const EditAvatar = () => {
 
   const onSubmitAvatar = async (data: z.infer<typeof avatarSchema>) => {
     const token = await getCookie("token");
-    console.log(data.avatar[0]);
-    console.log(token?.value);
     const formData = new FormData();
     formData.append("file", data.avatar[0]);
 
@@ -180,7 +200,6 @@ const EditAvatar = () => {
         const res = await fetch(`${BASE_URL}/profile/uploadProfilePicture`, {
           method: "PUT",
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token.value}`,
           },
           body: formData,
