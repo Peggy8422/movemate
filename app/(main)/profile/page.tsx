@@ -138,6 +138,7 @@ const Profile = async () => {
           priority
           width={1000}
           height={500}
+          crossOrigin="anonymous"
         />
         <EditCoverPhoto></EditCoverPhoto>
         <div className="absolute ml-5 -mt-10">
@@ -147,6 +148,7 @@ const Profile = async () => {
             alt="Paofile Avatar"
             width={100}
             height={100}
+            crossOrigin="anonymous"
           />
           <EditAvatar></EditAvatar>
         </div>

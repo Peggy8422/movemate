@@ -38,7 +38,7 @@ interface User {
   facebookId?: string;
   lineId?: string;
   coverPhoto: string;
-  profiflePic: string;
+  profilePic: string;
   isFilledOutDoc: boolean;
   iat: number;
   exp: number;
@@ -93,7 +93,7 @@ const NavHeader = () => {
                 {/* fetch avatar */}
                 <AvatarImage
                   crossOrigin="anonymous"
-                  src={user?.profilePic || "/default_user_avatar_1.png"}
+                  src={`/api/image-proxy?url=${encodeURIComponent(user?.profilePic || "")}` ||  "/default_user_avatar_1.png"}
                 />
                 {/* Fallback: username */}
                 <AvatarFallback>{user?.name}</AvatarFallback>

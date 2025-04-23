@@ -106,18 +106,6 @@ const EditCoverPhoto = () => {
       } catch (error) {
         console.error("Error uploading cover photo:", error);
       }
-
-      // const { message, path } = await updateProfileCover(
-      //   data.coverPhoto[0],
-      //   token.value
-      // );
-      // console.log(message);
-      // if (message === "Upload successful") {
-      //   console.log(path);
-      //   alert("封面照上傳成功");
-      //   form.reset();
-      //   router.refresh();
-      // }
     } else {
       console.error("Token is undefined");
     }
@@ -150,6 +138,7 @@ const EditCoverPhoto = () => {
                   <FormControl>
                     <Input
                       type="file"
+                      accept="image/jpg, image/jpeg, image/png"
                       {...coverPhotoRef}
                       onChange={(event) => {
                         field.onChange(event.target?.files ?? undefined);
@@ -211,12 +200,6 @@ const EditAvatar = () => {
           form.reset();
           const decodedToken = jwtDecode<UserAuth>(userDataToken);
           await setCookie("user", JSON.stringify(decodedToken));
-          // const userData = await getCookie("user");
-          // if (userData) {
-          //   const user = JSON.parse(userData.value);
-          //   user.coverPhoto = userBasicInfo.profilePic;
-          //   await setCookie("user", JSON.stringify(user));
-          // }
 
           router.refresh();
         } else {
@@ -225,17 +208,6 @@ const EditAvatar = () => {
       } catch (error) {
         console.error("Error uploading avatar:", error);
       }
-
-      // const { message, path } = await updateUserAvatar(
-      //   data.avatar[0],
-      //   token.value
-      // );
-      // if (message === "Upload successful") {
-      //   console.log(path);
-      //   alert("大頭貼照上傳成功");
-      //   form.reset();
-      //   router.refresh();
-      // }
     } else {
       console.error("Token is undefined");
     }
@@ -271,6 +243,7 @@ const EditAvatar = () => {
                   <FormControl>
                     <Input
                       type="file"
+                      accept="image/jpg, image/jpeg, image/png"
                       {...avatarRef}
                       onChange={(event) => {
                         field.onChange(event.target?.files ?? undefined);
