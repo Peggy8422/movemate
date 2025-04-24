@@ -111,9 +111,9 @@ export async function updateUserInfo(
 ) {
   try {
     const res = await fetch(`${BASE_URL}/profile/savePersonalProfile`, {
-      method: "POST",
+      method: "PUT",
       headers: {
-        "Content-Type": "application/json",
+        // "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(userData),

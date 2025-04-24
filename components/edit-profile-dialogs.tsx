@@ -283,6 +283,7 @@ const EditBasicInfo = ({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   // const [localDialogOpen, setLocalDialogOpen] = useState(false);
+  
   const [tempTags, setTempTags] = useState<string[]>([...personalTags]);
 
   const form = useForm<z.infer<typeof basicInfoSchema>>({
@@ -298,8 +299,8 @@ const EditBasicInfo = ({
     if (form.getValues("tag") === "") {
       return;
     }
-    setTempTags([...tempTags, form.getValues("tag")]);
-    form.reset();
+    setTempTags((prevTags) => [...prevTags, form.getValues("tag")]);
+    form.setValue("tag", "");
     form.clearErrors();
   };
 
@@ -308,20 +309,21 @@ const EditBasicInfo = ({
   };
 
   const onSubmit = async (data: z.infer<typeof basicInfoSchema>) => {
+    console.log(tempTags);
     const token = await getCookie("token");
     const updatedData = {
       name: data.userName,
       intro: data.selfIntroduction,
       personalTags: [...tempTags],
     };
-    console.log(updatedData);
+    console.log("saving before submit: ", updatedData);
 
     if (token?.value === undefined) {
       console.error("Token is undefined");
       return;
     }
     const userData = await updateUserInfo(updatedData, token?.value || "");
-    console.log(userData);
+    console.log("after update: ", userData);
 
     startTransition(() => {
       router.refresh();
@@ -369,6 +371,10 @@ const EditBasicInfo = ({
                             type="text"
                             placeholder="請輸入姓名"
                             {...field}
+                            value={field.value || ""}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -387,6 +393,10 @@ const EditBasicInfo = ({
                           <Textarea
                             placeholder="寫點什麼吧！讓大家快速認識你：）"
                             {...field}
+                            value={field.value || ""}
+                            onChange={(e) => {
+                              field.onChange(e.target.value);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />

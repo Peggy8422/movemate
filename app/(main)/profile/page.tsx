@@ -22,24 +22,12 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { Textarea } from "@/components/ui/textarea";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogHeader,
-//   DialogFooter,
-//   DialogTitle,
-//   DialogTrigger,
-//   DialogClose,
-// } from "@/components/ui/dialog";
-import Image from "next/image";
+
+import ImageWithFallback from "@/components/image-with-fallback";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLocationDot,
   faPlus,
-  // faCamera,
-  // faPenToSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -91,12 +79,7 @@ const getProfileData = async () => {
       ?.textAnswers[0]?.slice(0, 3),
     userLevel: "1",
     selfIntroduction: userBasicInfo.intro || "",
-    personalTags: userBasicInfo.personalTags || [
-      "喜歡動物",
-      "喜歡旅遊",
-      "喜歡美食",
-      "喜歡運動",
-    ],
+    personalTags: userBasicInfo.personalTags || ["新增標籤"],
     preferance: {
       place: userAnswers?.find(
         (item: { questionTitle: string }) =>
@@ -131,9 +114,12 @@ const Profile = async () => {
     <div className="p-10 sm:p-5">
       <Card className="mt-20 overflow-hidden relative">
         {/* edit: cover photo, avatar, name, living area, self introduction, personal tags */}
-        <Image
+        <ImageWithFallback
           className="w-full h-60 object-cover"
-          src={userCoverPhoto}
+          src={`/api/image-proxy?url=${encodeURIComponent(
+            userCoverPhoto || ""
+          )}`}
+          fallbackSrc="/default_user_cover.jpeg"
           alt="Profile Cover"
           priority
           width={1000}
@@ -142,9 +128,10 @@ const Profile = async () => {
         />
         <EditCoverPhoto></EditCoverPhoto>
         <div className="absolute ml-5 -mt-10">
-          <Image
+          <ImageWithFallback
             className="border-4 border-white rounded-xl bg-[#DEE6E8] w-[100px] h-[100px] object-cover"
-            src={userAvatar}
+            src={`/api/image-proxy?url=${encodeURIComponent(userAvatar || "")}`}
+            fallbackSrc="/default_user_avatar_1.png"
             alt="Paofile Avatar"
             width={100}
             height={100}
@@ -224,16 +211,16 @@ const Profile = async () => {
                     </PopoverTrigger>
                   </TooltipTrigger>
                   <PopoverContent className="w-80">
-                    <div className="grid gap-4">
-                      <div className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor="width">運動場所</Label>
-                        <Input
-                          id="width"
-                          defaultValue=""
-                          className="col-span-2 h-8"
-                        />
-                        <Button className="w-20 h-8">新增</Button>
-                      </div>
+                    <div className="flex items-center gap-4">
+                      <Label htmlFor="place" className="text-nowrap">
+                        運動場所
+                      </Label>
+                      <Input
+                        id="place"
+                        defaultValue=""
+                        className="col-span-2 h-8"
+                      />
+                      <Button className="w-20 h-8">新增</Button>
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -278,16 +265,16 @@ const Profile = async () => {
                     </PopoverTrigger>
                   </TooltipTrigger>
                   <PopoverContent className="w-80">
-                    <div className="grid gap-4">
-                      <div className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor="width">運動項目</Label>
-                        <Input
-                          id="width"
-                          defaultValue=""
-                          className="col-span-2 h-8"
-                        />
-                        <Button className="w-20 h-8">新增</Button>
-                      </div>
+                    <div className="flex items-center gap-4">
+                      <Label htmlFor="sportType" className="text-nowrap">
+                        運動項目
+                      </Label>
+                      <Input
+                        id="sportType"
+                        defaultValue=""
+                        className="col-span-2 h-8"
+                      />
+                      <Button className="w-20 h-8">新增</Button>
                     </div>
                   </PopoverContent>
                 </Popover>
