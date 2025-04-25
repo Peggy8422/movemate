@@ -2,33 +2,11 @@ import type { Metadata } from "next";
 import "../globals.css";
 import { ThemeProvider } from "@/components/next-theme-provider";
 import NavHeader from "@/components/nav-header";
-// import MobileBottomNavTabs from "@/components/mobile-bottom-nav-tabs";
-// import FriendListItem from "@/components/friend-list-item";
-// import CommunityListItem from "@/components/community-list-item";
 import {
   SidebarProvider,
-  // SidebarTrigger,
-  // Sidebar,
-  // SidebarContent,
-  // SidebarGroup,
-  // SidebarGroupContent,
-  // SidebarGroupLabel,
-  // SidebarMenu,
-  // SidebarMenuButton,
-  // SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import SidebarComp from "@/components/sidebar"
-import SocialListComp from "@/components/social-list"
-// import { Separator } from "@/components/ui/separator";
-// import { Button } from "@/components/ui/button";
-// import BrandLogo from "@/public/movemate_logo.svg";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import {
-//   faHome,
-//   faUser,
-//   faComments,
-//   faHeart,
-// } from "@fortawesome/free-solid-svg-icons";
+import SidebarComp from "@/components/sidebar";
+import SocialListComp from "@/components/social-list";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -40,6 +18,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const refreshAvatarId = Date.now();
   return (
     <html lang="en">
       <body className={`antialiased`}>
@@ -53,7 +32,7 @@ export default function RootLayout({
             <SidebarComp></SidebarComp>
             <main className="w-full bg-gradient-to-b from-neutral-50 dark:from-neutral-900 to-secondary relative">
               {/* nav-header */}
-              <NavHeader />
+              <NavHeader key={refreshAvatarId} />
               {/* <SidebarTrigger /> */}
               <div className="w-full h-full overflow-y-auto">{children}</div>
               <SocialListComp></SocialListComp>

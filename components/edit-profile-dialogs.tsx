@@ -44,7 +44,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { updateUserInfo, getCookie, setCookie } from "@/app/actions";
+import { getCookie, setCookie } from "@/app/actions";
 import { jwtDecode } from "jwt-decode";
 import { UserAuth } from "@/types/user";
 
@@ -282,8 +282,7 @@ const EditBasicInfo = ({
 }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-  // const [localDialogOpen, setLocalDialogOpen] = useState(false);
-  
+
   const [tempTags, setTempTags] = useState<string[]>([...personalTags]);
 
   const form = useForm<z.infer<typeof basicInfoSchema>>({
@@ -309,7 +308,6 @@ const EditBasicInfo = ({
   };
 
   const onSubmit = async (data: z.infer<typeof basicInfoSchema>) => {
-    console.log(tempTags);
     const token = await getCookie("token");
     const updatedData = {
       name: data.userName,
@@ -318,14 +316,36 @@ const EditBasicInfo = ({
     };
     console.log("saving before submit: ", updatedData);
 
-    if (token?.value === undefined) {
+    if (token?.value) {
+      try {
+        const res = await fetch(`${BASE_URL}/profile/savePersonalProfile`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token.value}`,
+          },
+          body: JSON.stringify(updatedData),
+        });
+        const result = await res.json();
+        const { success, message } = result;
+        if (success) {
+          console.log(message);
+          alert("個人資料更新成功");
+        } else {
+          console.error("Update failed:", message);
+        }
+      } catch (error) {
+        console.error("Error updating user info:", error);
+        alert("更新失敗，請稍後再試");
+      }
+    } else {
       console.error("Token is undefined");
+      alert("身份未驗證！");
       return;
     }
-    const userData = await updateUserInfo(updatedData, token?.value || "");
-    console.log("after update: ", userData);
 
     startTransition(() => {
+      form.reset();
       router.refresh();
     });
   };
@@ -334,14 +354,7 @@ const EditBasicInfo = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Dialog
-            onOpenChange={(open) => {
-              if (!open) {
-                form.reset();
-                setTempTags([...personalTags]);
-              }
-            }}
-          >
+          <Dialog>
             <DialogTrigger asChild>
               <Button
                 className="absolute right-2 bottom-2"

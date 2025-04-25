@@ -25,10 +25,7 @@ import { Label } from "@/components/ui/label";
 
 import ImageWithFallback from "@/components/image-with-fallback";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faLocationDot,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
+import { faLocationDot, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getCookie } from "@/app/actions";
@@ -55,6 +52,8 @@ const getProfileData = async () => {
   const { data } = await response.json();
   const userBasicInfo = data.profile;
   const userAnswers = data.answers;
+
+  console.log("userBasicInfo: ", userBasicInfo);
 
   return {
     userName: userBasicInfo.name,
@@ -94,6 +93,8 @@ const getProfileData = async () => {
 };
 
 const Profile = async () => {
+  // use dynamic key to mount/unmount image
+  const refreshImgId = Date.now();
   // fetch data here
   const {
     userName,
@@ -115,6 +116,7 @@ const Profile = async () => {
       <Card className="mt-20 overflow-hidden relative">
         {/* edit: cover photo, avatar, name, living area, self introduction, personal tags */}
         <ImageWithFallback
+          key={refreshImgId}
           className="w-full h-60 object-cover"
           src={`/api/image-proxy?url=${encodeURIComponent(
             userCoverPhoto || ""
@@ -129,10 +131,11 @@ const Profile = async () => {
         <EditCoverPhoto></EditCoverPhoto>
         <div className="absolute ml-5 -mt-10">
           <ImageWithFallback
+            key={refreshImgId + 1}
             className="border-4 border-white rounded-xl bg-[#DEE6E8] w-[100px] h-[100px] object-cover"
             src={`/api/image-proxy?url=${encodeURIComponent(userAvatar || "")}`}
             fallbackSrc="/default_user_avatar_1.png"
-            alt="Paofile Avatar"
+            alt="Profile Avatar"
             width={100}
             height={100}
             crossOrigin="anonymous"

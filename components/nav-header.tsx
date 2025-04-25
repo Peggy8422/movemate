@@ -5,6 +5,7 @@ import BrandLogo from "@/public/movemate_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -93,10 +94,22 @@ const NavHeader = () => {
                 {/* fetch avatar */}
                 <AvatarImage
                   crossOrigin="anonymous"
-                  src={`/api/image-proxy?url=${encodeURIComponent(user?.profilePic || "")}` ||  "/default_user_avatar_1.png"}
+                  src={
+                    user?.profilePic
+                      ? `/api/image-proxy?url=${encodeURIComponent(
+                          user.profilePic
+                        )}`
+                      : "/default_user_avatar_1.png"
+                  }
                 />
-                {/* Fallback: username */}
-                <AvatarFallback>{user?.name}</AvatarFallback>
+                <AvatarFallback>
+                  <Image
+                    src="/default_user_avatar_1.png"
+                    alt="avatar"
+                    width={40}
+                    height={40}
+                  />
+                </AvatarFallback>
               </Avatar>
               <div className="absolute right-0 bottom-0 h-2 w-2 bg-green-500 rounded-full"></div>
             </div>
