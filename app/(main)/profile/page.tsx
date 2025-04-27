@@ -34,6 +34,7 @@ import {
   EditCoverPhoto,
   EditAvatar,
   EditBasicInfo,
+  AddNewAnswerItem,
 } from "@/components/edit-profile-dialogs";
 
 const getProfileData = async () => {
@@ -199,39 +200,10 @@ const Profile = async () => {
           {/* add new item */}
           {/* popover */}
           {preferance.place.length < 5 && (
-            <TooltipProvider>
-              <Tooltip>
-                <Popover>
-                  <TooltipTrigger asChild>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-md w-6 h-6 hover:bg-primary hover:text-neutral-50"
-                      >
-                        <FontAwesomeIcon icon={faPlus} />
-                      </Button>
-                    </PopoverTrigger>
-                  </TooltipTrigger>
-                  <PopoverContent className="w-80">
-                    <div className="flex items-center gap-4">
-                      <Label htmlFor="place" className="text-nowrap">
-                        運動場所
-                      </Label>
-                      <Input
-                        id="place"
-                        defaultValue=""
-                        className="col-span-2 h-8"
-                      />
-                      <Button className="w-20 h-8">新增</Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                <TooltipContent>
-                  <p className="text-xs">新增常去的運動場所（至多5項）</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <AddNewAnswerItem
+              labelName="運動場所"
+              tooltipContent="新增常去的運動場所（至多5項）"
+            />
           )}
         </div>
       </div>
@@ -253,39 +225,10 @@ const Profile = async () => {
           )}
           {/* add new item */}
           {preferance.sportType.length < 5 && (
-            <TooltipProvider>
-              <Tooltip>
-                <Popover>
-                  <TooltipTrigger asChild>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-md w-6 h-6 hover:bg-primary hover:text-neutral-50"
-                      >
-                        <FontAwesomeIcon icon={faPlus} />
-                      </Button>
-                    </PopoverTrigger>
-                  </TooltipTrigger>
-                  <PopoverContent className="w-80">
-                    <div className="flex items-center gap-4">
-                      <Label htmlFor="sportType" className="text-nowrap">
-                        運動項目
-                      </Label>
-                      <Input
-                        id="sportType"
-                        defaultValue=""
-                        className="col-span-2 h-8"
-                      />
-                      <Button className="w-20 h-8">新增</Button>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-                <TooltipContent>
-                  <p className="text-xs">新增運動種類/項目（至多5項）</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <AddNewAnswerItem
+              labelName="運動項目"
+              tooltipContent="新增運動種類/項目（至多5項）"
+            />
           )}
         </div>
       </div>

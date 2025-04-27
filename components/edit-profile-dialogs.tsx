@@ -19,6 +19,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Form,
   FormControl,
   //   FormDescription,
@@ -27,6 +32,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 // import { Label } from "@/components/ui/label";
@@ -283,7 +289,11 @@ const EditBasicInfo = ({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const [tempTags, setTempTags] = useState<string[]>([...personalTags]);
+  const [tempTags, setTempTags] = useState<string[]>(
+    personalTags.length === 1 && personalTags[0] === "新增標籤"
+      ? []
+      : [...personalTags]
+  );
 
   const form = useForm<z.infer<typeof basicInfoSchema>>({
     resolver: zodResolver(basicInfoSchema),
@@ -488,4 +498,46 @@ const EditBasicInfo = ({
   );
 };
 
-export { EditCoverPhoto, EditAvatar, EditBasicInfo };
+const AddNewAnswerItem = ({ labelName, tooltipContent }: { labelName: string; tooltipContent: string }) => {
+  const [newItem, setNewItem] = useState<string>("");
+
+  const handleAddNewItem = () => {
+    if (newItem.trim() === "") return;
+    console.log(`新增${labelName}: ${newItem}`);
+    setNewItem("");
+  };
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <Popover>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="rounded-md w-6 h-6 hover:bg-primary hover:text-neutral-50"
+              >
+                <FontAwesomeIcon icon={faPlus} />
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger>
+          <PopoverContent className="w-80">
+            <div className="flex items-center gap-4">
+              <Label htmlFor="place" className="text-nowrap">
+                {labelName}
+              </Label>
+              <Input id="place" defaultValue={newItem} className="col-span-2 h-8" onChange={(e) => setNewItem(e.target.value)} />
+              <Button className="w-20 h-8" type="submit" onClick={handleAddNewItem}>新增</Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+        <TooltipContent>
+          <p className="text-xs">{tooltipContent}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+export { EditCoverPhoto, EditAvatar, EditBasicInfo, AddNewAnswerItem };
