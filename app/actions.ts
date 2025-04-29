@@ -1,7 +1,7 @@
 "use server";
 import { cookies } from "next/headers";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_DEV_BASE_URL;
 
 // cookies actions
 export async function setCookie(key: string, value: string) {
@@ -78,13 +78,9 @@ export async function forgetPassword(userEmail: string) {
     console.log(error);
     throw new Error("Something went wrong");
   }
-  
 }
 
-export async function resetPassword(
-  newPassword: string,
-  token: string
-) {
+export async function resetPassword(newPassword: string, token: string) {
   try {
     const res = await fetch(`${BASE_URL}/auth/reset-password/${token}`, {
       method: "POST",
