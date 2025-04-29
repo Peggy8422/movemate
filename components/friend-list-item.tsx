@@ -2,10 +2,10 @@
 
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAnglesRight } from "@fortawesome/free-solid-svg-icons";
-
 
 const FriendListItem = ({
   name,
@@ -23,7 +23,14 @@ const FriendListItem = ({
       <div className="relative">
         <Avatar className="h-14 w-14">
           <AvatarImage src={avatarSrc} />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>
+            <Image
+              src="/default_user_avatar_1.png"
+              alt="avatar"
+              width={50}
+              height={50}
+            />
+          </AvatarFallback>
         </Avatar>
         <div
           className={cn(

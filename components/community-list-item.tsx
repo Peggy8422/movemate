@@ -7,6 +7,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const CommunityListItem = ({
@@ -36,7 +37,14 @@ const CommunityListItem = ({
         <HoverCardTrigger>
           <Avatar className="cursor-pointer h-24 w-24 lg:h-20 lg:w-20 mx-auto border-2 border-primary">
             <AvatarImage src={avatarSrc} />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback>
+              <Image
+                src="/default_group_avatar.png"
+                alt="avatar"
+                width={100}
+                height={100}
+              />
+            </AvatarFallback>
           </Avatar>
           <div className="text-sm md:text-md font-bold text-neutral-800 dark:text-neutral-200 mt-2 max-w-full whitespace-nowrap overflow-hidden overflow-ellipsis">
             {name}

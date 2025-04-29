@@ -71,7 +71,7 @@ const NavHeader = () => {
           <div className="h-[30px]">
             <Separator orientation="vertical" className="mx-3" />
           </div>
-        )}
+        )}                     
         <BrandLogo
           fill="hsl(var(--primary))"
           width={50}

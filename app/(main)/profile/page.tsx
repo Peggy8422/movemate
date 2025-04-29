@@ -8,25 +8,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+// import {
+//   Tooltip,
+//   TooltipContent,
+//   TooltipProvider,
+//   TooltipTrigger,
+// } from "@/components/ui/tooltip";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+// import {
+//   Popover,
+//   PopoverContent,
+//   PopoverTrigger,
+// } from "@/components/ui/popover";
+// import { Input } from "@/components/ui/input";
+// import { Label } from "@/components/ui/label";
 
 import ImageWithFallback from "@/components/image-with-fallback";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLocationDot, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Button } from "@/components/ui/button";
+import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
+// import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getCookie } from "@/app/actions";
 
@@ -53,9 +53,7 @@ const getProfileData = async () => {
   const { data } = await response.json();
   const userBasicInfo = data.profile;
   const userAnswers = data.answers;
-
-  console.log("userBasicInfo: ", userBasicInfo);
-
+  
   return {
     userName: userBasicInfo.name,
     userAvatar: userBasicInfo.profilePic || "/default_user_avatar_1.png",
@@ -84,11 +82,11 @@ const getProfileData = async () => {
       place: userAnswers?.find(
         (item: { questionTitle: string }) =>
           item.questionTitle === "最常在哪裡運動？"
-      ).selections,
+      ),
       sportType: userAnswers?.find(
         (item: { questionTitle: string }) =>
           item.questionTitle === "喜歡的運動種類？"
-      ).selections,
+      ),
     },
   };
 };
@@ -186,7 +184,7 @@ const Profile = async () => {
           偏好的運動場所
         </h3>
         <div className="flex flex-wrap gap-3 ">
-          {preferance.place.map(
+          {preferance.place.selections.map(
             (p: { selectionId: string; selectionText: string }) => (
               <Badge
                 key={p.selectionId}
@@ -199,8 +197,9 @@ const Profile = async () => {
           )}
           {/* add new item */}
           {/* popover */}
-          {preferance.place.length < 5 && (
+          {preferance.place.selections.length < 5 && (
             <AddNewAnswerItem
+              answerId={preferance.place.answer_id}
               labelName="運動場所"
               tooltipContent="新增常去的運動場所（至多5項）"
             />
@@ -212,7 +211,7 @@ const Profile = async () => {
           喜歡的運動種類/項目
         </h3>
         <div className="flex flex-wrap gap-3 ">
-          {preferance.sportType.map(
+          {preferance.sportType.selections.map(
             (p: { selectionId: string; selectionText: string }) => (
               <Badge
                 key={p.selectionId}
@@ -224,8 +223,9 @@ const Profile = async () => {
             )
           )}
           {/* add new item */}
-          {preferance.sportType.length < 5 && (
+          {preferance.sportType.selections.length < 5 && (
             <AddNewAnswerItem
+              answerId={preferance.sportType.answer_id}
               labelName="運動項目"
               tooltipContent="新增運動種類/項目（至多5項）"
             />

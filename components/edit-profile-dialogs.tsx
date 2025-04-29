@@ -23,6 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { PopoverClose } from "@radix-ui/react-popover";
 import {
   Form,
   FormControl,
@@ -498,12 +499,20 @@ const EditBasicInfo = ({
   );
 };
 
-const AddNewAnswerItem = ({ labelName, tooltipContent }: { labelName: string; tooltipContent: string }) => {
+const AddNewAnswerItem = ({
+  labelName,
+  tooltipContent,
+  answerId,
+}: {
+  labelName: string;
+  tooltipContent: string;
+  answerId: string;
+}) => {
   const [newItem, setNewItem] = useState<string>("");
 
   const handleAddNewItem = () => {
     if (newItem.trim() === "") return;
-    console.log(`新增${labelName}: ${newItem}`);
+    console.log(`新增${labelName}(${answerId}): ${newItem}`);
     setNewItem("");
   };
 
@@ -527,8 +536,21 @@ const AddNewAnswerItem = ({ labelName, tooltipContent }: { labelName: string; to
               <Label htmlFor="place" className="text-nowrap">
                 {labelName}
               </Label>
-              <Input id="place" defaultValue={newItem} className="col-span-2 h-8" onChange={(e) => setNewItem(e.target.value)} />
-              <Button className="w-20 h-8" type="submit" onClick={handleAddNewItem}>新增</Button>
+              <Input
+                id="place"
+                defaultValue={newItem}
+                className="col-span-2 h-8"
+                onChange={(e) => setNewItem(e.target.value)}
+              />
+              <PopoverClose asChild>
+                <Button
+                  className="w-20 h-8"
+                  type="submit"
+                  onClick={handleAddNewItem}
+                >
+                  新增
+                </Button>
+              </PopoverClose>
             </div>
           </PopoverContent>
         </Popover>
