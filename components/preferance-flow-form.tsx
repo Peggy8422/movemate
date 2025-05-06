@@ -30,13 +30,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2 } from "lucide-react";
 // import Link from "next/link";
 
-// import {
-//   placeOptions,
-//   sportTypeOptions,
-//   purposeOptions,
-//   frequencyOptions,
-// } from "@/consts/preferance-flow-options";
-
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

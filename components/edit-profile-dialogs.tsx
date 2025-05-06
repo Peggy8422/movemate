@@ -59,13 +59,19 @@ const BASE_URL = process.env.NEXT_PUBLIC_DEV_BASE_URL;
 
 const coverPhotoSchema = z.object({
   coverPhoto: z
-    .instanceof(FileList)
+    .unknown()
+    .transform((value) => {
+      return value as FileList;
+    })
     .refine((file) => file?.length == 1, "File is required."),
 });
 
 const avatarSchema = z.object({
   avatar: z
-    .instanceof(FileList)
+    .unknown()
+    .transform((value) => {
+      return value as FileList;
+    })
     .refine((file) => file?.length == 1, "File is required."),
 });
 

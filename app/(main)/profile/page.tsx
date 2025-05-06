@@ -195,6 +195,17 @@ const Profile = async () => {
               </Badge>
             )
           )}
+          {preferance.place.textAnswers?.map(
+            (p: string) => (
+              <Badge
+                key={p}
+                variant="secondary"
+                className="text-sm rounded-sm shadow-sm text-neutral-100"
+              >
+                {p}
+              </Badge>
+            )
+          )}
           {/* add new item */}
           {/* popover */}
           {preferance.place.selections.length < 5 && (
