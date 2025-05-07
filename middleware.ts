@@ -28,6 +28,10 @@ export function middleware(request: NextRequest) {
   } else {
     return NextResponse.next();
   }
+
+//   if (request.nextUrl.pathname === "/preferance-flow") {
+//     // TODO get flow questions
+//   }
 }
 
 // export function middleware(request: NextRequest) {

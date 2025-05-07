@@ -13,23 +13,17 @@ const LoginRedirectPageContent = () => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  if (token) {
-    const decodedToken = jwtDecode<UserAuth>(token);
-    if (!decodedToken.isFilledOutDoc) {
-      router.push("/preferance-flow");
-    } else {
-      router.push("/");
-    }
-  }
-
   useEffect(() => {
-    if (!token) {
-      router.push("/sign-in");
-    } else {
+    if (token) {
       const setUserData = async () => {
         await setCookie("token", token);
         const decodedToken = jwtDecode<UserAuth>(token);
         await setCookie("user", JSON.stringify(decodedToken));
+        if (!decodedToken.isFilledOutDoc) {
+          router.push("/preferance-flow");
+        } else {
+          router.push("/");
+        }
       };
 
       setUserData();
@@ -61,7 +55,7 @@ const LoginRedirectPageContent = () => {
 
 const LoginRedirect = () => {
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <LoginRedirectPageContent></LoginRedirectPageContent>
     </Suspense>
   );

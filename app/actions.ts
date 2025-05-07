@@ -82,10 +82,11 @@ export async function forgetPassword(userEmail: string) {
 
 export async function resetPassword(newPassword: string, token: string) {
   try {
-    const res = await fetch(`${BASE_URL}/auth/reset-password/${token}`, {
+    const res = await fetch(`${BASE_URL}/auth/reset-password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         newPassword,
@@ -98,3 +99,5 @@ export async function resetPassword(newPassword: string, token: string) {
     throw new Error("Something went wrong");
   }
 }
+
+export async function saveOtherFlowAnswer() {}

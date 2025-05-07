@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import taiwanCityDistrictRoads from "@/public/json/taiwan_city_district_road.json";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -26,19 +27,15 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2 } from "lucide-react";
 // import Link from "next/link";
-
-import {
-  placeOptions,
-  sportTypeOptions,
-  purposeOptions,
-  frequencyOptions,
-} from "@/consts/preferance-flow-options";
-import { getCookie } from "@/app/actions";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+
+import { Question } from "@/types/question";
+import { getCookie } from "@/app/actions";
 
 const formSchema = z
   .object({
@@ -65,20 +62,22 @@ const formSchema = z
   })
   .required();
 
-const PreferanceFlowForm = () => {
+const questionNameMap: { [key: string]: string } = {
+  身高: "height",
+  體重: "weight",
+  性別: "sexual",
+  年齡: "age",
+  "住哪?": "city",
+  "最常在哪裡運動？": "place",
+  "喜歡的運動種類？": "sportType",
+  "的運動頻率？": "frequency",
+  "的運動目的？": "purpose",
+};
+
+const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    const getToken = async () => {
-      const token = await getCookie("token");
-      if (!token) {
-        router.push("/sign-in");
-      }
-    };
-
-    getToken();
-  }, [router]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     mode: "onChange",
@@ -87,7 +86,7 @@ const PreferanceFlowForm = () => {
     defaultValues: {
       height: null,
       weight: null,
-      sexual: "male", // boy: 1, girl: 2
+      sexual: questions.find((q) => q.title === "性別")?.selections[0].id,
       age: null,
       city: "",
       district: "",
@@ -99,9 +98,63 @@ const PreferanceFlowForm = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const districtOptions = taiwanCityDistrictRoads.find(
+    (item: {
+      CityName: string;
+      AreaList: {
+        AreaName: string;
+        RoadList: { RoadName: string; RoadEngName: string }[];
+      }[];
+    }) => item.CityName === form.watch("city")
+  )?.AreaList;
+  const roadOptions = districtOptions?.find(
+    (item: {
+      AreaName: string;
+      RoadList: { RoadName: string; RoadEngName: string }[];
+    }) => item.AreaName === form.watch("district")
+  )?.RoadList;
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
     // sent to backend
     console.log(data);
+    const payload = questions.map((question: Question) => ({
+      questionId: question.id,
+      selectionId:
+        (question.isBasic && question.title !== "性別") ||
+        question.title === "住哪?"
+          ? []
+          : question.isSingle
+          ? [data[questionNameMap[question.title] as keyof typeof data]]
+          : data[questionNameMap[question.title] as keyof typeof data],
+      textAnswer:
+        question.title === "住哪?"
+          ? `${data.city}${data.district}${data.road}`
+          : question.isBasic && question.title !== "性別"
+          ? data[
+              questionNameMap[question.title] as keyof typeof data
+            ]?.toString()
+          : null,
+    }));
+
+    const token = await getCookie("token");
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/flow/saveFlowAnswer`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token?.value}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    const { message, success } = await res.json();
+    console.log(message);
+    if (success) {
+      alert("個人偏好設定完成!");
+      router.push("/");
+    }
   };
 
   const handlePrevStep = (e: React.FormEvent) => {
@@ -124,381 +177,346 @@ const PreferanceFlowForm = () => {
           {currentStep === 1 && (
             <div>
               <h1 className="mb-6">Q1: 請填寫個人資料</h1>
-              {/* <div className="border-solid border-2 rounded-3xl border-neutral-500 text-neutral-500 px-6 py-1 inline-block mb-3">
-             關於你
-           </div> */}
-
-              <FormField
-                control={form.control}
-                name="height"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[80px] min-w-fit pt-2">
-                      身高
-                    </FormLabel>
-                    <div className="flex-grow">
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={1}
-                          placeholder="請輸入身高"
-                          {...field}
-                          value={
-                            field.value !== null ? String(field.value) : ""
-                          }
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            field.onChange(value ? Number(value) : null);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="weight"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[80px] min-w-fit pt-2">
-                      體重
-                    </FormLabel>
-                    <div className="flex-grow">
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={1}
-                          placeholder="請輸入體重"
-                          {...field}
-                          value={
-                            field.value !== null ? String(field.value) : ""
-                          }
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            field.onChange(value ? Number(value) : null);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="sexual"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[100px] min-w-fit pt-2">
-                      生理性別
-                    </FormLabel>
-                    <FormControl>
-                      <Tabs defaultValue={field.value} className="w-full">
-                        <TabsList className="bg-transparent w-full p-0">
-                          <TabsTrigger
-                            value="male"
-                            className="flex-grow border-2 border-secondary text-secondary data-[state=active]:text-neutral-50 data-[state=active]:bg-primary data-[state=active]:border-primary dark:data-[state=active]:bg-neutral-600 dark:data-[state=active]:border-neutral-600"
-                          >
-                            生理男
-                          </TabsTrigger>
-                          <TabsTrigger
-                            value="female"
-                            className="flex-grow border-2 border-secondary text-secondary data-[state=active]:text-neutral-50 data-[state=active]:bg-primary data-[state=active]:border-primary dark:data-[state=active]:bg-neutral-600 dark:data-[state=active]:border-neutral-600"
-                          >
-                            生理女
-                          </TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="age"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[80px] min-w-fit pt-2">
-                      年齡
-                    </FormLabel>
-                    <div className="flex-grow">
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={18}
-                          placeholder="請輸入年齡"
-                          {...field}
-                          value={
-                            field.value !== null ? String(field.value) : ""
-                          }
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            field.onChange(value ? Number(value) : null);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          {currentStep === 2 && (
-            <div>
-              <h1 className="mb-6">Q2: 請問您的居住地？</h1>
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[100px] min-w-fit pt-2">
-                      縣市
-                    </FormLabel>
-                    <div className="flex-grow">
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
+              {questions
+                ?.filter((question: Question) => question.isBasic)
+                .map((question: Question) =>
+                  question.title === "性別" ? (
+                    <FormField
+                      key={question.id}
+                      control={form.control}
+                      name="sexual"
+                      render={({ field }) => (
+                        <FormItem className="mb-6 flex gap-2">
+                          <FormLabel className="w-[100px] min-w-fit pt-2">
+                            生理性別
+                          </FormLabel>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="請選擇縣市" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="taipei">台北市</SelectItem>
-                            <SelectItem value="toayuan">桃園市</SelectItem>
-                            <SelectItem value="keelung">基隆市</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="district"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[100px] min-w-fit pt-2">
-                      區（鄉鎮）
-                    </FormLabel>
-                    <div className="flex-grow">
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="請選擇區（鄉鎮）" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="beitou">北投區</SelectItem>
-                            <SelectItem value="shilin">士林區</SelectItem>
-                            <SelectItem value="zhongzheng">中正區</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="road"
-                render={({ field }) => (
-                  <FormItem className="mb-6 flex gap-2">
-                    <FormLabel className="w-[100px] min-w-fit pt-2">
-                      路（街）
-                    </FormLabel>
-                    <div className="flex-grow">
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="請選擇路（街）名" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="linong st2">
-                              立農街二段
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          {currentStep === 3 && (
-            <div>
-              <h1 className="mb-6">Q3: 請問您最常在哪裡運動?</h1>
-              <FormField
-                control={form.control}
-                name="place"
-                render={({ field }) => (
-                  <FormItem className="mb-6">
-                    <FormControl>
-                      <RadioGroup
-                        defaultValue={field.value}
-                        onValueChange={field.onChange}
-                        className="space-y-4"
-                      >
-                        {placeOptions.map((option) => (
-                          <div
-                            key={option.value}
-                            className="flex items-center space-x-2"
-                          >
-                            <RadioGroupItem
-                              value={option.value}
-                              id={option.value}
-                            />
-                            <Label
-                              htmlFor={option.value}
-                              className="font-normal"
+                            <Tabs
+                              value={field.value}
+                              onValueChange={field.onChange}
+                              className="w-full"
                             >
-                              {option.text}
-                            </Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          {currentStep === 4 && (
-            <div>
-              <h1 className="mb-6">Q4: 請問您喜歡的運動種類？（至多選3項）</h1>
-              {sportTypeOptions.map((option, index) => (
-                <FormField
-                  key={option.value}
-                  control={form.control}
-                  name="sportType"
-                  render={({ field }) => (
-                    <FormItem className="mb-3 flex items-center gap-2">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value?.includes(option.value)}
-                          onCheckedChange={(checked: boolean) => {
-                            return checked
-                              ? field.onChange(
-                                  field.value !== null
-                                    ? [...field.value, option.value]
-                                    : [option.value]
-                                )
-                              : field.onChange(
-                                  field.value?.filter(
-                                    (value) => value !== option.value
+                              <TabsList className="bg-transparent w-full p-0">
+                                {question.selections.map(
+                                  (item: { id: string; selection: string }) => (
+                                    <TabsTrigger
+                                      key={item.id}
+                                      value={item.id}
+                                      className="flex-grow border-2 border-secondary text-secondary data-[state=active]:text-neutral-50 data-[state=active]:bg-primary data-[state=active]:border-primary dark:data-[state=active]:bg-neutral-600 dark:data-[state=active]:border-neutral-600"
+                                    >
+                                      {item.selection}
+                                    </TabsTrigger>
                                   )
-                                );
-                          }}
-                        />
-                      </FormControl>
-                      <FormLabel className="text-sm font-normal mt-0">
-                        {option.text}
-                      </FormLabel>
-                      {index === 0 && <FormMessage />}
-                    </FormItem>
-                  )}
-                />
-              ))}
+                                )}
+                              </TabsList>
+                            </Tabs>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <FormField
+                      key={question.id}
+                      control={form.control}
+                      name={
+                        questionNameMap[question.title] as keyof z.infer<
+                          typeof formSchema
+                        >
+                      }
+                      render={({ field }) => (
+                        <FormItem className="mb-6 flex gap-2">
+                          <FormLabel className="w-[80px] min-w-fit pt-2">
+                            {question.title}
+                            {question.title === "身高" && "(cm)"}
+                            {question.title === "體重" && "(kg)"}
+                            {question.title === "年齡" && "(歲)"}
+                          </FormLabel>
+                          <div className="flex-grow">
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min={1}
+                                placeholder={`請輸入${question.title}`}
+                                {...field}
+                                value={
+                                  field.value !== null
+                                    ? String(field.value)
+                                    : ""
+                                }
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  field.onChange(value ? Number(value) : null);
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  )
+                )}
+                
             </div>
           )}
-          {currentStep === 5 && (
-            <div>
-              <h1 className="mb-6">Q5: 請問您的運動頻率?</h1>
-              <FormField
-                control={form.control}
-                name="frequency"
-                render={({ field }) => (
-                  <FormItem className="mb-6">
-                    <FormControl>
-                      <RadioGroup
-                        defaultValue={field.value}
-                        onValueChange={field.onChange}
-                        className="space-y-4"
-                      >
-                        {frequencyOptions.map((option) => (
-                          <div
-                            key={option.value}
-                            className="flex items-center space-x-2"
-                          >
-                            <RadioGroupItem
-                              value={option.value}
-                              id={option.value}
-                            />
-                            <Label
-                              htmlFor={option.value}
-                              className="font-normal"
+          {/* map questions: not basic */}
+          {questions
+            ?.filter((question: Question) => !question.isBasic)
+            .map((question: Question, index: number) => {
+              return (
+                currentStep === index + 2 && (
+                  <div key={question.id}>
+                    <h1 className="mb-6">
+                      Q{index + 2}: 請問您{question.title}
+                    </h1>
+                    {index + 2 === 2 && (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem className="mb-6 flex gap-2">
+                              <FormLabel className="w-[100px] min-w-fit pt-2">
+                                縣市
+                              </FormLabel>
+                              <div className="flex-grow">
+                                <FormControl>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={
+                                      typeof field.value === "string"
+                                        ? field.value
+                                        : undefined
+                                    }
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="請選擇縣市" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {taiwanCityDistrictRoads.map(
+                                        (city: {
+                                          CityEngName: string;
+                                          CityName: string;
+                                        }) => (
+                                          <SelectItem
+                                            key={city.CityEngName}
+                                            value={city.CityName}
+                                          >
+                                            {city.CityName}
+                                          </SelectItem>
+                                        )
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                                <FormMessage />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="district"
+                          render={({ field }) => (
+                            <FormItem className="mb-6 flex gap-2">
+                              <FormLabel className="w-[100px] min-w-fit pt-2">
+                                區（鄉鎮）
+                              </FormLabel>
+                              <div className="flex-grow">
+                                <FormControl>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={
+                                      typeof field.value === "string"
+                                        ? field.value
+                                        : undefined
+                                    }
+                                    disabled={form.getValues("city") === ""}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="請選擇區（鄉鎮）" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {districtOptions?.map(
+                                        (district: {
+                                          AreaEngName: string;
+                                          AreaName: string;
+                                        }) => (
+                                          <SelectItem
+                                            key={district.AreaEngName}
+                                            value={district.AreaName}
+                                          >
+                                            {district.AreaName}
+                                          </SelectItem>
+                                        )
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                                <FormMessage />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="road"
+                          render={({ field }) => (
+                            <FormItem className="mb-6 flex gap-2">
+                              <FormLabel className="w-[100px] min-w-fit pt-2">
+                                路（街）
+                              </FormLabel>
+                              <div className="flex-grow">
+                                <FormControl>
+                                  <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={
+                                      typeof field.value === "string"
+                                        ? field.value
+                                        : undefined
+                                    }
+                                    disabled={form.getValues("district") === ""}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="請選擇路（街）名" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {roadOptions?.map(
+                                        (road: {
+                                          RoadName: string;
+                                          RoadEngName: string;
+                                        }) => (
+                                          <SelectItem
+                                            key={road.RoadEngName}
+                                            value={road.RoadName}
+                                          >
+                                            {road.RoadName}
+                                          </SelectItem>
+                                        )
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                                <FormMessage />
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                      </>
+                    )}
+                    {/* 選擇題 */}
+                    {index + 2 >= 3 &&
+                      (question.isSingle ? (
+                        <FormField
+                          control={form.control}
+                          name={
+                            questionNameMap[question.title] as keyof z.infer<
+                              typeof formSchema
                             >
-                              {option.text}
-                            </Label>
-                          </div>
-                        ))}
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          )}
-          {currentStep === 6 && (
-            <div>
-              <h1 className="mb-6">Q6: 請問您的運動目的是什麼?（至多選3項）</h1>
-              {purposeOptions.map((option, index) => (
-                <FormField
-                  key={option.value}
-                  control={form.control}
-                  name="purpose"
-                  render={({ field }) => (
-                    <FormItem className="mb-6 flex items-center gap-2">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value?.includes(option.value)}
-                          onCheckedChange={(checked: boolean) => {
-                            return checked
-                              ? field.onChange(
-                                  field.value !== null
-                                    ? [...field.value, option.value]
-                                    : [option.value]
-                                )
-                              : field.onChange(
-                                  field.value?.filter(
-                                    (value) => value !== option.value
-                                  )
-                                );
-                          }}
+                          }
+                          render={({ field }) => (
+                            <FormItem className="mb-6">
+                              <FormControl>
+                                <RadioGroup
+                                  defaultValue={
+                                    typeof field.value === "string"
+                                      ? field.value
+                                      : undefined
+                                  }
+                                  onValueChange={field.onChange}
+                                  className="space-y-4"
+                                >
+                                  {question.selections.map(
+                                    (option: {
+                                      id: string;
+                                      selection: string;
+                                    }) => (
+                                      <div
+                                        key={option.id}
+                                        className="flex items-center space-x-2"
+                                      >
+                                        <RadioGroupItem
+                                          value={option.id}
+                                          id={option.id}
+                                        />
+                                        <Label
+                                          htmlFor={option.id}
+                                          className="font-normal"
+                                        >
+                                          {option.selection}
+                                        </Label>
+                                      </div>
+                                    )
+                                  )}
+                                </RadioGroup>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </FormControl>
-                      <FormLabel className="text-sm font-normal mt-0">
-                        {option.text}
-                      </FormLabel>
-                      {index === 0 && <FormMessage />}
-                    </FormItem>
-                  )}
-                />
-              ))}
-            </div>
-          )}
+                      ) : (
+                        question.selections.map(
+                          (
+                            option: { id: string; selection: string },
+                            index: number
+                          ) => (
+                            <FormField
+                              key={option.id}
+                              control={form.control}
+                              name={
+                                questionNameMap[
+                                  question.title
+                                ] as keyof z.infer<typeof formSchema>
+                              }
+                              render={({ field }) => (
+                                <FormItem className="mb-3 flex items-center gap-2">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={
+                                        Array.isArray(field.value) &&
+                                        field.value.includes(option.id)
+                                      }
+                                      onCheckedChange={(checked: boolean) => {
+                                        return checked
+                                          ? field.onChange(
+                                              field.value !== null
+                                                ? Array.isArray(field.value)
+                                                  ? [...field.value, option.id]
+                                                  : [option.id]
+                                                : [option.id]
+                                            )
+                                          : field.onChange(
+                                              Array.isArray(field.value)
+                                                ? field.value.filter(
+                                                    (value: string) =>
+                                                      value !== option.id
+                                                  )
+                                                : []
+                                            );
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="text-sm font-normal mt-0">
+                                    {option.selection}
+                                  </FormLabel>
+                                  {index === 0 && <FormMessage />}
+                                </FormItem>
+                              )}
+                            />
+                          )
+                        )
+                      ))}
+                  </div>
+                )
+              );
+            })}
           <div className="mt-10 flex justify-end gap-2">
             {currentStep > 1 && (
               <Button
@@ -523,10 +541,12 @@ const PreferanceFlowForm = () => {
                   !form.formState.isValid ||
                   Object.values(form.control._formValues).some(
                     (value) => !value
-                  )
+                  ) ||
+                  isLoading
                 }
               >
-                完成
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? "送出中..." : "完成"}
               </Button>
             )}
           </div>

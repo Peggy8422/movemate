@@ -125,7 +125,7 @@ const SocialListComp = () => {
                   membersNum={290}
                 />
                 <CommunityListItem
-                  isMobileScreen
+                  isMobileScreen={false}
                   name={"社群 ABCDEFG"}
                   description="社群描述..."
                   avatarSrc={

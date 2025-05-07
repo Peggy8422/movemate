@@ -9,6 +9,7 @@ export interface UserAuth extends JwtPayload {
   facebookId: string;
   lineId: string;
   coverPhoto: string;
+  profilePic: string;
   isFilledOutDoc: boolean;
   iat: number;
   exp: number;

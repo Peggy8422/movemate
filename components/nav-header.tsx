@@ -5,6 +5,7 @@ import BrandLogo from "@/public/movemate_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,20 +39,17 @@ interface User {
   facebookId?: string;
   lineId?: string;
   coverPhoto: string;
+  profilePic: string;
   isFilledOutDoc: boolean;
   iat: number;
   exp: number;
 }
 
-
 const NavHeader = () => {
-  
-  
   const [user, setUser] = useState<User | null>(null);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
-
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -64,7 +62,7 @@ const NavHeader = () => {
   }, []);
 
   return (
-    <div className="brand-header w-full pr-8 pl-3 py-4 flex items-center justify-between absolute top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900 z-50">
+    <div className="brand-header w-full pr-8 pl-3 py-4 flex items-center justify-between absolute top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900 z-40">
       <div className="flex items-center">
         {pathname !== "/preferance-flow" && (
           <SidebarTrigger className="text-primary" />
@@ -73,7 +71,7 @@ const NavHeader = () => {
           <div className="h-[30px]">
             <Separator orientation="vertical" className="mx-3" />
           </div>
-        )}
+        )}                     
         <BrandLogo
           fill="hsl(var(--primary))"
           width={50}
@@ -94,9 +92,24 @@ const NavHeader = () => {
             <div className="relative">
               <Avatar className="cursor-pointer border-2 border-secondary">
                 {/* fetch avatar */}
-                <AvatarImage src={user?.coverPhoto || "/default_user_avatar_1.png"} />
-                {/* Fallback: username */}
-                <AvatarFallback>{user?.name}</AvatarFallback>
+                <AvatarImage
+                  crossOrigin="anonymous"
+                  src={
+                    user?.profilePic
+                      ? `/api/image-proxy?url=${encodeURIComponent(
+                          user.profilePic
+                        )}`
+                      : "/default_user_avatar_1.png"
+                  }
+                />
+                <AvatarFallback>
+                  <Image
+                    src="/default_user_avatar_1.png"
+                    alt="avatar"
+                    width={40}
+                    height={40}
+                  />
+                </AvatarFallback>
               </Avatar>
               <div className="absolute right-0 bottom-0 h-2 w-2 bg-green-500 rounded-full"></div>
             </div>
@@ -105,7 +118,10 @@ const NavHeader = () => {
             <DropdownMenuLabel>我的帳戶</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem disabled={pathname === "/preferance-flow"}>
+              <DropdownMenuItem
+                disabled={pathname === "/preferance-flow"}
+                onClick={() => router.push("/profile")}
+              >
                 個人頁面設定
               </DropdownMenuItem>
               <DropdownMenuItem
