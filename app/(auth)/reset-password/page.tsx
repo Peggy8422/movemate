@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 import { resetPassword } from "@/app/actions";
@@ -107,9 +107,11 @@ const ResetPasswordForm = () => {
 
 const ResetPassword = () => {
   return (
-    <div className="h-full position-relative">
-      <ResetPasswordForm />
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="h-full position-relative">
+        <ResetPasswordForm />
+      </div>
+    </Suspense>
   );
 };
 
