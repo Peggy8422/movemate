@@ -43,6 +43,7 @@ const formSchema = z
     weight: z.number().min(1).int().nullable(),
     sexual: z.string(),
     age: z.number().min(18).int().nullable(),
+    birthday: z.string().nullable(),
     // live place
     city: z.string(),
     district: z.string(),
@@ -67,6 +68,7 @@ const questionNameMap: { [key: string]: string } = {
   體重: "weight",
   性別: "sexual",
   年齡: "age",
+  生日: "birthday",
   "住哪?": "city",
   "最常在哪裡運動？": "place",
   "喜歡的運動種類？": "sportType",
@@ -88,6 +90,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
       weight: null,
       sexual: questions.find((q) => q.title === "性別")?.selections[0].id,
       age: null,
+      birthday: "",
       city: "",
       district: "",
       road: "",
@@ -231,24 +234,31 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                             {question.title === "身高" && "(cm)"}
                             {question.title === "體重" && "(kg)"}
                             {question.title === "年齡" && "(歲)"}
+                            {question.title === "生日" && "(年月日)"}
                           </FormLabel>
                           <div className="flex-grow">
                             <FormControl>
-                              <Input
-                                type="number"
-                                min={1}
-                                placeholder={`請輸入${question.title}`}
-                                {...field}
-                                value={
-                                  field.value !== null
-                                    ? String(field.value)
-                                    : ""
-                                }
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  field.onChange(value ? Number(value) : null);
-                                }}
-                              />
+                              {question.title !== "生日" ? (
+                                <Input
+                                  type="number"
+                                  min={1}
+                                  placeholder={`請輸入${question.title}`}
+                                  {...field}
+                                  value={
+                                    field.value !== null
+                                      ? String(field.value)
+                                      : ""
+                                  }
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    field.onChange(
+                                      value ? Number(value) : null
+                                    );
+                                  }}
+                                />
+                              ) : (
+                                <></>
+                              )}
                             </FormControl>
                             <FormMessage />
                           </div>
@@ -257,7 +267,6 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                     />
                   )
                 )}
-                
             </div>
           )}
           {/* map questions: not basic */}

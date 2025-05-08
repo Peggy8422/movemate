@@ -35,7 +35,9 @@ import {
   EditAvatar,
   EditBasicInfo,
   AddNewAnswerItem,
+  AnswerItemTag,
 } from "@/components/edit-profile-dialogs";
+// import { X } from "lucide-react";
 
 const getProfileData = async () => {
   const token = await getCookie("token");
@@ -53,7 +55,7 @@ const getProfileData = async () => {
   const { data } = await response.json();
   const userBasicInfo = data.profile;
   const userAnswers = data.answers;
-  
+
   return {
     userName: userBasicInfo.name,
     userAvatar: userBasicInfo.profilePic || "/default_user_avatar_1.png",
@@ -186,16 +188,27 @@ const Profile = async () => {
         <div className="flex flex-wrap gap-3 ">
           {preferance.place.selections.map(
             (p: { selectionId: string; selectionText: string }) => (
-              <Badge
+              <AnswerItemTag
                 key={p.selectionId}
-                variant="secondary"
-                className="text-sm rounded-sm shadow-sm text-neutral-100"
-              >
-                {p.selectionText}
-              </Badge>
+                selectionId={p.selectionId}
+                selectionText={p.selectionText}
+                answerId={preferance.place.answer_id}
+                questionId={preferance.place.questionId}
+                selectionIds={preferance.place.selections.map(
+                  (p: { selectionId: string; selectionText: string }) =>
+                    p.selectionId
+                )}
+              ></AnswerItemTag>
+              // <Badge
+              //   key={p.selectionId}
+              //   variant="secondary"
+              //   className="text-sm rounded-sm shadow-sm text-neutral-100"
+              // >
+              //   {p.selectionText}
+              // </Badge>
             )
           )}
-          {preferance.place.textAnswers?.map(
+          {/* {preferance.place.textAnswers?.map(
             (p: string) => (
               <Badge
                 key={p}
@@ -205,12 +218,17 @@ const Profile = async () => {
                 {p}
               </Badge>
             )
-          )}
+          )} */}
           {/* add new item */}
           {/* popover */}
           {preferance.place.selections.length < 5 && (
             <AddNewAnswerItem
               answerId={preferance.place.answer_id}
+              questionId={preferance.place.questionId}
+              selectionIds={preferance.place.selections.map(
+                (p: { selectionId: string; selectionText: string }) =>
+                  p.selectionId
+              )}
               labelName="運動場所"
               tooltipContent="新增常去的運動場所（至多5項）"
             />
@@ -223,20 +241,36 @@ const Profile = async () => {
         </h3>
         <div className="flex flex-wrap gap-3 ">
           {preferance.sportType.selections.map(
-            (p: { selectionId: string; selectionText: string }) => (
-              <Badge
-                key={p.selectionId}
-                variant="secondary"
-                className="text-sm rounded-sm shadow-sm text-neutral-100"
-              >
-                {p.selectionText}
-              </Badge>
+            (s: { selectionId: string; selectionText: string }) => (
+              <AnswerItemTag
+                key={s.selectionId}
+                selectionId={s.selectionId}
+                selectionText={s.selectionText}
+                answerId={preferance.place.answer_id}
+                questionId={preferance.place.questionId}
+                selectionIds={preferance.place.selections.map(
+                  (s: { selectionId: string; selectionText: string }) =>
+                    s.selectionId
+                )}
+              ></AnswerItemTag>
+              // <Badge
+              //   key={p.selectionId}
+              //   variant="secondary"
+              //   className="text-sm rounded-sm shadow-sm text-neutral-100"
+              // >
+              //   {p.selectionText}
+              // </Badge>
             )
           )}
           {/* add new item */}
           {preferance.sportType.selections.length < 5 && (
             <AddNewAnswerItem
               answerId={preferance.sportType.answer_id}
+              questionId={preferance.sportType.questionId}
+              selectionIds={preferance.sportType.selections.map(
+                (p: { selectionId: string; selectionText: string }) =>
+                  p.selectionId
+              )}
               labelName="運動項目"
               tooltipContent="新增運動種類/項目（至多5項）"
             />
