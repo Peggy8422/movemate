@@ -27,7 +27,18 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2 } from "lucide-react";
+
+// for birthday picker
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { Loader2, CalendarIcon } from "lucide-react";
 // import Link from "next/link";
 
 import { z } from "zod";
@@ -79,6 +90,9 @@ const questionNameMap: { [key: string]: string } = {
 const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  // for birthday date
+  const [date, setDate] = useState<Date>();
+
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -133,7 +147,15 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
       textAnswer:
         question.title === "住哪?"
           ? `${data.city}${data.district}${data.road}`
-          : question.isBasic && question.title !== "性別"
+          : question.isBasic &&
+            question.title !== "性別" &&
+            question.title !== "生日"
+          ? data[
+              questionNameMap[question.title] as keyof typeof data
+            ]?.toString()
+          : null,
+      birthDate:
+        question.title === "生日"
           ? data[
               questionNameMap[question.title] as keyof typeof data
             ]?.toString()
@@ -257,7 +279,41 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                                   }}
                                 />
                               ) : (
-                                <></>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant={"outline"}
+                                      className={cn(
+                                        "w-full justify-start text-left font-normal rounded-md",
+                                        !date && "text-muted-foreground"
+                                      )}
+                                    >
+                                      <CalendarIcon />
+                                      {date ? (
+                                        format(date, "PPP")
+                                      ) : (
+                                        <span>請選擇生日</span>
+                                      )}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent
+                                    className="w-auto p-0"
+                                    align="start"
+                                  >
+                                    <Calendar
+                                      captionLayout="dropdown"
+                                      startMonth={new Date(1900, 0)}
+                                      endMonth={new Date()}
+                                      mode="single"
+                                      selected={date}
+                                      onSelect={(e) => {
+                                        const value = e ? format(e, "yyyy-MM-dd") : "";
+                                        setDate(e);
+                                        field.onChange(value ? value : "");
+                                      }}
+                                    />
+                                  </PopoverContent>
+                                </Popover>
                               )}
                             </FormControl>
                             <FormMessage />
