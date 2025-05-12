@@ -53,7 +53,6 @@ const formSchema = z
     height: z.number().min(1).int().nullable(),
     weight: z.number().min(1).int().nullable(),
     sexual: z.string(),
-    age: z.number().min(18).int().nullable(),
     birthday: z.string().nullable(),
     // live place
     city: z.string(),
@@ -78,7 +77,6 @@ const questionNameMap: { [key: string]: string } = {
   身高: "height",
   體重: "weight",
   性別: "sexual",
-  年齡: "age",
   生日: "birthday",
   "住哪?": "city",
   "最常在哪裡運動？": "place",
@@ -103,7 +101,6 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
       height: null,
       weight: null,
       sexual: questions.find((q) => q.title === "性別")?.selections[0].id,
-      age: null,
       birthday: "",
       city: "",
       district: "",
@@ -306,6 +303,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                                       endMonth={new Date()}
                                       mode="single"
                                       selected={date}
+                                      {...field}
                                       onSelect={(e) => {
                                         const value = e ? format(e, "yyyy-MM-dd") : "";
                                         setDate(e);

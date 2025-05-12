@@ -56,6 +56,14 @@ const getProfileData = async () => {
   const userBasicInfo = data.profile;
   const userAnswers = data.answers;
 
+  // calculate age
+  const birthDate = new Date(userAnswers?.find(
+      (item: { questionTitle: string }) => item.questionTitle === "生日"
+    )?.birthDate);
+
+  const today = new Date();
+  const age = today.getFullYear() - birthDate.getFullYear();
+
   return {
     userName: userBasicInfo.name,
     userAvatar: userBasicInfo.profilePic || "/default_user_avatar_1.png",
@@ -63,9 +71,7 @@ const getProfileData = async () => {
     userSexual: userAnswers?.find(
       (item: { questionTitle: string }) => item.questionTitle === "性別"
     )?.selections[0].selectionText,
-    userAge: userAnswers?.find(
-      (item: { questionTitle: string }) => item.questionTitle === "年齡"
-    )?.textAnswers,
+    userAge: age,
     userHeight: userAnswers?.find(
       (item: { questionTitle: string }) => item.questionTitle === "身高"
     )?.textAnswers,
