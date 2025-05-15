@@ -24,7 +24,7 @@ import { Loader2 } from "lucide-react";
 // } from "next";
 // import { GET, POST } from "@/app/api/auth/[...nextauth]/route";
 
-import { login } from "@/app/actions";
+// import { login } from "@/app/actions";
 import { forgetPassword } from "@/app/actions";
 import { jwtDecode } from "jwt-decode";
 import { setCookie } from "@/app/actions";
@@ -111,27 +111,64 @@ const SignIn = () => {
   // login
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    const {
-      success,
-      message,
-      data: token,
-    } = await login(data.account, data.password);
 
-    if (success) {
-      setIsLoginSuccess(true);
-      await setCookie("token", token);
-      const decodedToken = jwtDecode<UserAuth>(token);
-      console.log(decodedToken);
-      await setCookie("user", JSON.stringify(decodedToken));
-      if (!decodedToken.isFilledOutDoc) {
-        router.push("/preferance-flow");
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: data.account,
+            password: data.password,
+          }),
+        }
+      );
+      const result = await res.json();
+      const { success, message, data: token } = result;
+      if (success) {
+        setIsLoginSuccess(true);
+        await setCookie("token", token);
+        const decodedToken = jwtDecode<UserAuth>(token);
+        console.log(decodedToken);
+        await setCookie("user", JSON.stringify(decodedToken));
+        if (!decodedToken.isFilledOutDoc) {
+          router.push("/preferance-flow");
+        } else {
+          router.push("/");
+        }
       } else {
-        router.push("/");
+        alert("登入失敗: " + message);
+        setIsLoading(false);
       }
-    } else {
-      alert("登入失敗: " + message);
-      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      throw new Error("Something went wrong");
     }
+
+    // const {
+    //   success,
+    //   message,
+    //   data: token,
+    // } = await login(data.account, data.password);
+
+    // if (success) {
+    //   setIsLoginSuccess(true);
+    //   await setCookie("token", token);
+    //   const decodedToken = jwtDecode<UserAuth>(token);
+    //   console.log(decodedToken);
+    //   await setCookie("user", JSON.stringify(decodedToken));
+    //   if (!decodedToken.isFilledOutDoc) {
+    //     router.push("/preferance-flow");
+    //   } else {
+    //     router.push("/");
+    //   }
+    // } else {
+    //   alert("登入失敗: " + message);
+    //   setIsLoading(false);
+    // }
   };
 
   // 記錄一下是否為第一次登入 -> 都先導去首頁，後端回傳資料後再做判斷
