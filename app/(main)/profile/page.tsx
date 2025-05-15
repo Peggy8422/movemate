@@ -192,7 +192,7 @@ const Profile = async () => {
           偏好的運動場所
         </h3>
         <div className="flex flex-wrap gap-3 ">
-          {preferance.place.selections.map(
+          {preferance.place?.selections?.map(
             (p: { selectionId: string; selectionText: string }) => (
               <AnswerItemTag
                 key={p.selectionId}
@@ -227,7 +227,7 @@ const Profile = async () => {
           )} */}
           {/* add new item */}
           {/* popover */}
-          {preferance.place.selections.length < 5 && (
+          {preferance.place?.selections?.length < 5 && (
             <AddNewAnswerItem
               answerId={preferance.place.answer_id}
               questionId={preferance.place.questionId}
@@ -246,15 +246,15 @@ const Profile = async () => {
           喜歡的運動種類/項目
         </h3>
         <div className="flex flex-wrap gap-3 ">
-          {preferance.sportType.selections.map(
+          {preferance.sportType?.selections?.map(
             (s: { selectionId: string; selectionText: string }) => (
               <AnswerItemTag
                 key={s.selectionId}
                 selectionId={s.selectionId}
                 selectionText={s.selectionText}
-                answerId={preferance.place.answer_id}
-                questionId={preferance.place.questionId}
-                selectionIds={preferance.place.selections.map(
+                answerId={preferance.sportType?.answer_id}
+                questionId={preferance.sportType?.questionId}
+                selectionIds={preferance.sportType?.selections.map(
                   (s: { selectionId: string; selectionText: string }) =>
                     s.selectionId
                 )}
@@ -269,11 +269,11 @@ const Profile = async () => {
             )
           )}
           {/* add new item */}
-          {preferance.sportType.selections.length < 5 && (
+          {preferance.sportType?.selections?.length < 5 && (
             <AddNewAnswerItem
-              answerId={preferance.sportType.answer_id}
-              questionId={preferance.sportType.questionId}
-              selectionIds={preferance.sportType.selections.map(
+              answerId={preferance.sportType?.answer_id}
+              questionId={preferance.sportType?.questionId}
+              selectionIds={preferance.sportType?.selections.map(
                 (p: { selectionId: string; selectionText: string }) =>
                   p.selectionId
               )}
