@@ -185,6 +185,7 @@ const SignIn = () => {
     } else {
       alert("發送重設密碼信件失敗, 請稍後再試");
     }
+    resetPasswordForm.reset();
   };
 
   return (
@@ -293,29 +294,29 @@ const SignIn = () => {
                             <AlertDialogTitle>忘記密碼</AlertDialogTitle>
                             <AlertDialogDescription>
                               請輸入您註冊時的帳戶(電子信箱)，以重設密碼
-                              <Form {...resetPasswordForm}>
-                                <FormField
-                                  control={resetPasswordForm.control}
-                                  name="account"
-                                  render={({ field }) => (
-                                    <FormItem className="mt-3">
-                                      <FormLabel className="text-primary">
-                                        帳戶
-                                      </FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
-                                          type="email"
-                                          placeholder="請輸入註冊時的電子信箱"
-                                          {...field}
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </Form>
                             </AlertDialogDescription>
+                            <Form {...resetPasswordForm}>
+                              <FormField
+                                control={resetPasswordForm.control}
+                                name="account"
+                                render={({ field }) => (
+                                  <FormItem className="mt-3">
+                                    <FormLabel className="text-primary">
+                                      帳戶
+                                    </FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        className="border-t-0 border-r-0 border-l-0 border-b-1 border-b-primary rounded-none focus-visible:ring-0 bg-transparent"
+                                        type="email"
+                                        placeholder="請輸入註冊時的電子信箱"
+                                        {...field}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </Form>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>取消</AlertDialogCancel>

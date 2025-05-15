@@ -470,6 +470,7 @@ const EditBasicInfo = ({
                         {tag}
                         <X
                           className="cursor-pointer"
+                          size={20}
                           id={tag}
                           onClick={handleDeleteTag}
                         />
@@ -509,16 +510,51 @@ const AddNewAnswerItem = ({
   labelName,
   tooltipContent,
   answerId,
+  questionId,
+  selectionIds,
 }: {
   labelName: string;
   tooltipContent: string;
   answerId: string;
+  questionId: string;
+  selectionIds: string[];
 }) => {
+  const router = useRouter();
   const [newItem, setNewItem] = useState<string>("");
 
-  const handleAddNewItem = () => {
+  const handleAddNewItem = async () => {
+    const token = await getCookie("token");
     if (newItem.trim() === "") return;
     console.log(`新增${labelName}(${answerId}): ${newItem}`);
+    try {
+      const res = await fetch(`${BASE_URL}/profile/saveOtherFlowAnswer`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token?.value}`,
+        },
+        body: JSON.stringify({
+          answer_id: answerId,
+          questionId,
+          selectionId: [...selectionIds],
+          textAnswer: [newItem],
+        }),
+      });
+      const result = await res.json();
+      const { success, message } = result;
+      if (success) {
+        console.log(message);
+        alert("新增成功");
+        router.refresh();
+      } else {
+        console.error("Update failed:", message);
+        alert("新增失敗，請稍後再試");
+      }
+    } catch (error) {
+      console.error("Error adding new item:", error);
+      alert("新增失敗，請稍後再試");
+    }
+
     setNewItem("");
   };
 
@@ -568,4 +604,78 @@ const AddNewAnswerItem = ({
   );
 };
 
-export { EditCoverPhoto, EditAvatar, EditBasicInfo, AddNewAnswerItem };
+const AnswerItemTag = ({
+  selectionId,
+  selectionText,
+  answerId,
+  questionId,
+  selectionIds,
+}: {
+  selectionId: string;
+  selectionText: string;
+  answerId: string;
+  questionId: string;
+  selectionIds: string[];
+}) => {
+  const router = useRouter();
+
+  const handleDeleteTag = async () => {
+    const token = await getCookie("token");
+    const newSelectionIds = selectionIds.filter(
+      (s: string) => s !== selectionId
+    );
+
+    try {
+      const res = await fetch(`${BASE_URL}/profile/saveOtherFlowAnswer`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token?.value}`,
+        },
+        body: JSON.stringify({
+          answer_id: answerId,
+          questionId,
+          selectionId: newSelectionIds,
+          textAnswer: [],
+        }),
+      });
+      const result = await res.json();
+      const { success, message } = result;
+      if (success) {
+        console.log(message);
+        alert("選項更新成功");
+        router.refresh();
+      } else {
+        console.error("Delete failed:", message);
+        alert("刪除失敗，請稍後再試");
+      }
+    } catch (error) {
+      console.error("Error deleting tag:", error);
+      alert("刪除失敗，請稍後再試");
+    }
+  };
+
+  return (
+    <Badge
+      key={selectionId}
+      variant="secondary"
+      className="text-sm rounded-sm shadow-sm text-neutral-100 relative"
+    >
+      {selectionText}
+      <X
+        className="cursor-pointer absolute -top-2 -right-2"
+        size={14}
+        id={selectionId}
+        onClick={handleDeleteTag}
+      />
+    </Badge>
+  );
+};
+
+export {
+  EditCoverPhoto,
+  EditAvatar,
+  EditBasicInfo,
+  AddNewAnswerItem,
+  AnswerItemTag,
+};

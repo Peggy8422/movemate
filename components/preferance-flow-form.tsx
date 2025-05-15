@@ -27,7 +27,18 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2 } from "lucide-react";
+
+// for birthday picker
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { Loader2, CalendarIcon } from "lucide-react";
 // import Link from "next/link";
 
 import { z } from "zod";
@@ -42,7 +53,7 @@ const formSchema = z
     height: z.number().min(1).int().nullable(),
     weight: z.number().min(1).int().nullable(),
     sexual: z.string(),
-    age: z.number().min(18).int().nullable(),
+    birthday: z.string().nullable(),
     // live place
     city: z.string(),
     district: z.string(),
@@ -66,7 +77,7 @@ const questionNameMap: { [key: string]: string } = {
   身高: "height",
   體重: "weight",
   性別: "sexual",
-  年齡: "age",
+  生日: "birthday",
   "住哪?": "city",
   "最常在哪裡運動？": "place",
   "喜歡的運動種類？": "sportType",
@@ -77,6 +88,9 @@ const questionNameMap: { [key: string]: string } = {
 const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  // for birthday date
+  const [date, setDate] = useState<Date>();
+
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -87,7 +101,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
       height: null,
       weight: null,
       sexual: questions.find((q) => q.title === "性別")?.selections[0].id,
-      age: null,
+      birthday: "",
       city: "",
       district: "",
       road: "",
@@ -130,7 +144,15 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
       textAnswer:
         question.title === "住哪?"
           ? `${data.city}${data.district}${data.road}`
-          : question.isBasic && question.title !== "性別"
+          : question.isBasic &&
+            question.title !== "性別" &&
+            question.title !== "生日"
+          ? data[
+              questionNameMap[question.title] as keyof typeof data
+            ]?.toString()
+          : null,
+      birthDate:
+        question.title === "生日"
           ? data[
               questionNameMap[question.title] as keyof typeof data
             ]?.toString()
@@ -231,24 +253,66 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                             {question.title === "身高" && "(cm)"}
                             {question.title === "體重" && "(kg)"}
                             {question.title === "年齡" && "(歲)"}
+                            {question.title === "生日" && "(年月日)"}
                           </FormLabel>
                           <div className="flex-grow">
                             <FormControl>
-                              <Input
-                                type="number"
-                                min={1}
-                                placeholder={`請輸入${question.title}`}
-                                {...field}
-                                value={
-                                  field.value !== null
-                                    ? String(field.value)
-                                    : ""
-                                }
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  field.onChange(value ? Number(value) : null);
-                                }}
-                              />
+                              {question.title !== "生日" ? (
+                                <Input
+                                  type="number"
+                                  min={1}
+                                  placeholder={`請輸入${question.title}`}
+                                  {...field}
+                                  value={
+                                    field.value !== null
+                                      ? String(field.value)
+                                      : ""
+                                  }
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    field.onChange(
+                                      value ? Number(value) : null
+                                    );
+                                  }}
+                                />
+                              ) : (
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant={"outline"}
+                                      className={cn(
+                                        "w-full justify-start text-left font-normal rounded-md",
+                                        !date && "text-muted-foreground"
+                                      )}
+                                    >
+                                      <CalendarIcon />
+                                      {date ? (
+                                        format(date, "PPP")
+                                      ) : (
+                                        <span>請選擇生日</span>
+                                      )}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent
+                                    className="w-auto p-0"
+                                    align="start"
+                                  >
+                                    <Calendar
+                                      captionLayout="dropdown"
+                                      startMonth={new Date(1900, 0)}
+                                      endMonth={new Date()}
+                                      mode="single"
+                                      selected={date}
+                                      {...field}
+                                      onSelect={(e) => {
+                                        const value = e ? format(e, "yyyy-MM-dd") : "";
+                                        setDate(e);
+                                        field.onChange(value ? value : "");
+                                      }}
+                                    />
+                                  </PopoverContent>
+                                </Popover>
+                              )}
                             </FormControl>
                             <FormMessage />
                           </div>
@@ -257,7 +321,6 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                     />
                   )
                 )}
-                
             </div>
           )}
           {/* map questions: not basic */}

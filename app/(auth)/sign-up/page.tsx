@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 // import { useRouter } from "next/navigation";
 
-import { signup } from "@/app/actions";
+// import { signup } from "@/app/actions";
 import {
   Form,
   FormControl,
@@ -33,164 +33,194 @@ const formSchema = z
     lastname: z.string().min(1).max(50),
     firstname: z.string().min(1).max(50),
     account: z.string().email(), //email
-    password: z.string().min(6).max(12),
-    checkedPassword: z.string().min(6).max(12),
+    password: z.string().min(10),
+    checkedPassword: z.string().min(10),
   })
   .required();
 
-const SignUpForm = (
-//   {
-//   setIsSignupSuccess,
-// }: {
-//   setIsSignupSuccess: React.Dispatch<React.SetStateAction<boolean>>;
-// }
-) => {
-  const [isLoading, setIsLoading] = useState(false);
-  // const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      lastname: "",
-      firstname: "",
-      account: "",
-      password: "",
-    },
-  });
+const SignUpForm = () =>
+  //   {
+  //   setIsSignupSuccess,
+  // }: {
+  //   setIsSignupSuccess: React.Dispatch<React.SetStateAction<boolean>>;
+  // }
+  {
+    const [isLoading, setIsLoading] = useState(false);
+    // const router = useRouter();
+    const form = useForm<z.infer<typeof formSchema>>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        lastname: "",
+        firstname: "",
+        account: "",
+        password: "",
+        checkedPassword: "",
+      },
+    });
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    const { message } = await signup(
-      `${data.firstname}${data.lastname}`,
-      data.account,
-      data.password
+    const onSubmit = async (data: z.infer<typeof formSchema>) => {
+      setIsLoading(true);
+      // const { message } = await signup(
+      //   `${data.firstname}${data.lastname}`,
+      //   data.account,
+      //   data.password
+      // );
+      let message = "";
+
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/auth/signup`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: `${data.firstname}${data.lastname}`,
+              email: data.account,
+              password: data.password,
+            }),
+          }
+        );
+        const result = await res.json();
+        if (typeof result.message === "string") {
+          message = result.message;
+        } else {
+          for (const m in result.message) {
+            message += `${m}: ${result.message[m].join(". ")}\n`;
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        throw new Error("Something went wrong");
+      }
+
+      // if (success) {
+      //   setIsSignupSuccess(true);
+      //   router.push("/sign-in");
+      // } else {
+      alert(message);
+      setIsLoading(false);
+      form.reset();
+      // }
+    };
+
+    return (
+      <Form {...form}>
+        <h1 className="text-3xl font-bold text-primary text-center mb-3">
+          註冊會員
+        </h1>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="flex gap-2">
+            <FormField
+              control={form.control}
+              name="lastname"
+              render={({ field }) => (
+                <FormItem className="mb-3 flex-grow">
+                  <FormLabel>姓氏</FormLabel>
+                  <FormControl>
+                    <Input placeholder="（ex: 王）" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="firstname"
+              render={({ field }) => (
+                <FormItem className="mb-3 flex-grow">
+                  <FormLabel>名字</FormLabel>
+                  <FormControl>
+                    <Input placeholder="（ex: 小明）" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="account"
+            render={({ field }) => (
+              <FormItem className="mb-3">
+                <FormLabel>註冊帳戶（電子信箱）</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    autoComplete="username"
+                    placeholder="請使用電子信箱註冊（ex: test@example.com)"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="mb-3">
+                <FormLabel>註冊密碼</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder="請設定6~12位英文字母大小寫和數字混合的密碼"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="checkedPassword"
+            render={({ field }) => (
+              <FormItem className="mb-3">
+                <FormLabel>確認密碼</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder="請再次輸入密碼"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex items-center justify-center gap-2 mt-10">
+            <Button
+              type="submit"
+              size="sm"
+              className="w-1/4 min-w-[150px]"
+              disabled={
+                !form.formState.isValid ||
+                form.getValues("password") !==
+                  form.getValues("checkedPassword") ||
+                isLoading
+              }
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading ? "註冊中..." : "註冊"}
+            </Button>
+            <Button
+              size="sm"
+              asChild
+              variant="outline"
+              className="w-1/4 min-w-[150px]"
+            >
+              <Link href="/sign-in">以其他方式登入</Link>
+            </Button>
+          </div>
+        </form>
+      </Form>
     );
-
-    // if (success) {
-    //   setIsSignupSuccess(true);
-    //   router.push("/sign-in");
-    // } else {
-    alert(message);
-    setIsLoading(false);
-    form.reset();
-    // }
   };
-
-  return (
-    <Form {...form}>
-      <h1 className="text-3xl font-bold text-primary text-center mb-3">
-        註冊會員
-      </h1>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex gap-2">
-          <FormField
-            control={form.control}
-            name="lastname"
-            render={({ field }) => (
-              <FormItem className="mb-3 flex-grow">
-                <FormLabel>姓氏</FormLabel>
-                <FormControl>
-                  <Input placeholder="（ex: 王）" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="firstname"
-            render={({ field }) => (
-              <FormItem className="mb-3 flex-grow">
-                <FormLabel>名字</FormLabel>
-                <FormControl>
-                  <Input placeholder="（ex: 小明）" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <FormField
-          control={form.control}
-          name="account"
-          render={({ field }) => (
-            <FormItem className="mb-3">
-              <FormLabel>註冊帳戶（電子信箱）</FormLabel>
-              <FormControl>
-                <Input
-                  type="email"
-                  autoComplete="username"
-                  placeholder="請使用電子信箱註冊（ex: test@example.com)"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem className="mb-3">
-              <FormLabel>註冊密碼</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="請設定6~12位英文字母大小寫和數字混合的密碼"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="checkedPassword"
-          render={({ field }) => (
-            <FormItem className="mb-3">
-              <FormLabel>確認密碼</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="請再次輸入密碼"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="flex items-center justify-center gap-2 mt-10">
-          <Button
-            type="submit"
-            size="sm"
-            className="w-1/4 min-w-[150px]"
-            disabled={
-              !form.formState.isValid ||
-              form.getValues("password") !==
-                form.getValues("checkedPassword") ||
-              isLoading
-            }
-          >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? "註冊中..." : "註冊"}
-          </Button>
-          <Button
-            size="sm"
-            asChild
-            variant="outline"
-            className="w-1/4 min-w-[150px]"
-          >
-            <Link href="/sign-in">以其他方式登入</Link>
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-};
 
 const SignUp = () => {
   // const [isSignupSuccess, setIsSignupSuccess] = useState(false);
