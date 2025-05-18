@@ -6,7 +6,7 @@ import { getCookie } from "@/app/actions";
 const getFlowQuestions = async () => {
   const token = await getCookie("token");
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/flow/getFlow`,
+    `${process.env.DEV_BASE_URL}/flow/getFlow`,
     {
       method: "GET",
       headers: {

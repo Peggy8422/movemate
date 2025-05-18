@@ -1,7 +1,7 @@
 "use server";
 import { cookies } from "next/headers";
 
-const BASE_URL = process.env.NEXT_PUBLIC_DEV_BASE_URL;
+const BASE_URL = process.env.DEV_BASE_URL ?? "http://localhost:3000";
 
 // cookies actions
 export async function setCookie(key: string, value: string) {

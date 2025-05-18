@@ -42,7 +42,7 @@ import {
 const getProfileData = async () => {
   const token = await getCookie("token");
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/profile/getPersonalPorfile`,
+    `${process.env.DEV_BASE_URL}/profile/getPersonalPorfile`,
     {
       method: "GET",
       headers: {
