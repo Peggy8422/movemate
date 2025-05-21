@@ -1,4 +1,5 @@
 import React from "react";
+import { apiFetch } from "@/lib/fetcher";
 import {
   Card,
   CardContent,
@@ -41,18 +42,17 @@ import {
 
 const getProfileData = async () => {
   const token = await getCookie("token");
-  const response = await fetch(
-    `${process.env.DEV_BASE_URL}/profile/getPersonalPorfile`,
+  const result = await apiFetch(
+    "/profile/getPersonalProfile",
     {
       method: "GET",
       headers: {
         // "Content-Type": "application/json",
         Authorization: `Bearer ${token?.value}`,
       },
-      cache: "no-store",
     }
   );
-  const { data } = await response.json();
+  const { data } = result;
   const userBasicInfo = data.profile;
   const userAnswers = data.answers;
 
