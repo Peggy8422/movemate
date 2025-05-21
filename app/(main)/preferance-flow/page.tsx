@@ -1,12 +1,13 @@
 import React from "react";
+import { apiFetch } from "@/lib/fetcher";
 
 import PreferanceFlowForm from "@/components/preferance-flow-form";
 import { getCookie } from "@/app/actions";
 
 const getFlowQuestions = async () => {
   const token = await getCookie("token");
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/flow/getFlow`,
+  const data = await apiFetch(
+    "/flow/getFlow",
     {
       method: "GET",
       headers: {
@@ -15,7 +16,7 @@ const getFlowQuestions = async () => {
       },
     }
   );
-  const data = await response.json();
+  // const data = await response.json();
   return {
     questions: data.data,
   };

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { apiFetch } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -55,8 +56,6 @@ import { getCookie, setCookie } from "@/app/actions";
 import { jwtDecode } from "jwt-decode";
 import { UserAuth } from "@/types/user";
 
-const BASE_URL = process.env.NEXT_PUBLIC_DEV_BASE_URL;
-
 const coverPhotoSchema = z.object({
   coverPhoto: z
     .unknown()
@@ -99,14 +98,14 @@ const EditCoverPhoto = () => {
 
     if (token?.value) {
       try {
-        const res = await fetch(`${BASE_URL}/profile/uploadCoverPicture`, {
+        const result = await apiFetch("/profile/uploadCoverPicture", {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${token.value}`,
           },
           body: formData,
         });
-        const result = await res.json();
+
         const { success, message } = result;
         if (success) {
           console.log(message);
@@ -197,14 +196,14 @@ const EditAvatar = () => {
 
     if (token?.value) {
       try {
-        const res = await fetch(`${BASE_URL}/profile/uploadProfilePicture`, {
+        const result = await apiFetch("/profile/uploadProfilePicture", {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${token.value}`,
           },
           body: formData,
         });
-        const result = await res.json();
+
         console.log("updated avatar:", result);
         const { success, message, data: userDataToken } = result;
         if (success) {
@@ -335,7 +334,7 @@ const EditBasicInfo = ({
 
     if (token?.value) {
       try {
-        const res = await fetch(`${BASE_URL}/profile/savePersonalProfile`, {
+        const result = await apiFetch("/profile/savePersonalProfile", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -343,7 +342,7 @@ const EditBasicInfo = ({
           },
           body: JSON.stringify(updatedData),
         });
-        const result = await res.json();
+
         const { success, message } = result;
         if (success) {
           console.log(message);
@@ -527,7 +526,7 @@ const AddNewAnswerItem = ({
     if (newItem.trim() === "") return;
     console.log(`新增${labelName}(${answerId}): ${newItem}`);
     try {
-      const res = await fetch(`${BASE_URL}/profile/saveOtherFlowAnswer`, {
+      const result = await apiFetch("/profile/saveOtherFlowAnswer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -540,7 +539,7 @@ const AddNewAnswerItem = ({
           textAnswer: [newItem],
         }),
       });
-      const result = await res.json();
+
       const { success, message } = result;
       if (success) {
         console.log(message);
@@ -626,7 +625,7 @@ const AnswerItemTag = ({
     );
 
     try {
-      const res = await fetch(`${BASE_URL}/profile/saveOtherFlowAnswer`, {
+      const result = await apiFetch("/profile/saveOtherFlowAnswer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -639,7 +638,7 @@ const AnswerItemTag = ({
           textAnswer: [],
         }),
       });
-      const result = await res.json();
+
       const { success, message } = result;
       if (success) {
         console.log(message);

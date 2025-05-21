@@ -1,7 +1,6 @@
 "use server";
 import { cookies } from "next/headers";
-
-const BASE_URL = process.env.NEXT_PUBLIC_DEV_BASE_URL;
+import { apiFetch } from "@/lib/fetcher";
 
 // cookies actions
 export async function setCookie(key: string, value: string) {
@@ -23,7 +22,7 @@ export async function signup(
   userPassword: string
 ) {
   try {
-    const res = await fetch(`${BASE_URL}/auth/signup`, {
+    const data = await apiFetch("/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +33,6 @@ export async function signup(
         password: userPassword,
       }),
     });
-    const data = await res.json();
     return data;
   } catch (error) {
     console.log(error);
@@ -44,7 +42,7 @@ export async function signup(
 
 export async function login(userEmail: string, userPassword: string) {
   try {
-    const res = await fetch(`${BASE_URL}/auth/login`, {
+    const data = await apiFetch("/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +52,6 @@ export async function login(userEmail: string, userPassword: string) {
         password: userPassword,
       }),
     });
-    const data = await res.json();
     return data;
   } catch (error) {
     console.log(error);
@@ -65,14 +62,13 @@ export async function login(userEmail: string, userPassword: string) {
 // forget/reset password
 export async function forgetPassword(userEmail: string) {
   try {
-    const res = await fetch(`${BASE_URL}/auth/forget-password`, {
+    const data = await apiFetch("/auth/forget-password", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email: userEmail }),
     });
-    const data = await res.json();
     return data;
   } catch (error) {
     console.log(error);
@@ -82,7 +78,7 @@ export async function forgetPassword(userEmail: string) {
 
 export async function resetPassword(newPassword: string, token: string) {
   try {
-    const res = await fetch(`${BASE_URL}/auth/reset-password`, {
+    const data = await apiFetch("/auth/reset-password", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +88,6 @@ export async function resetPassword(newPassword: string, token: string) {
         newPassword,
       }),
     });
-    const data = await res.json();
     return data;
   } catch (error) {
     console.log(error);

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { apiFetch } from "@/lib/fetcher";
 // import { useRouter } from "next/navigation";
 
 // import { signup } from "@/app/actions";
@@ -68,21 +69,19 @@ const SignUpForm = () =>
       let message = "";
 
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/auth/signup`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: `${data.firstname}${data.lastname}`,
-              email: data.account,
-              password: data.password,
+        const result = await apiFetch("/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: `${data.firstname}${data.lastname}`,
+            email: data.account,
+            password: data.password,
             }),
           }
         );
-        const result = await res.json();
+        
         if (typeof result.message === "string") {
           message = result.message;
         } else {

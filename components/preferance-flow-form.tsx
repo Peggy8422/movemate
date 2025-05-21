@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { apiFetch } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import taiwanCityDistrictRoads from "@/public/json/taiwan_city_district_road.json";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -160,18 +161,16 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
     }));
 
     const token = await getCookie("token");
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/flow/saveFlowAnswer`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token?.value}`,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-    const { message, success } = await res.json();
+    const result = await apiFetch("/flow/saveFlowAnswer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token?.value}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    
+    const { message, success } = result;
     console.log(message);
     if (success) {
       alert("個人偏好設定完成!");
