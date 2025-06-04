@@ -1,8 +1,8 @@
 export const apiFetch = async (path: string, options: RequestInit = {}) => {
   const isServer = typeof window === "undefined";
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_DEV_BASE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    // process.env.NEXT_PUBLIC_DEV_BASE_URL || "http://localhost:3000";
 
   const fetchOptions: RequestInit & { cache?: RequestCache } = {
     ...options,
