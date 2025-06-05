@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { apiFetch } from "@/lib/fetcher";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -113,8 +114,8 @@ const SignIn = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_DEV_BASE_URL}/auth/login`,
+      const result = await apiFetch(
+        "/auth/login",
         {
           method: "POST",
           headers: {
@@ -126,7 +127,7 @@ const SignIn = () => {
           }),
         }
       );
-      const result = await res.json();
+
       const { success, message, data: token } = result;
       if (success) {
         setIsLoginSuccess(true);
