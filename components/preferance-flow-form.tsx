@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { apiFetch } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import taiwanCityDistrictRoads from "@/public/json/taiwan_city_district_road.json";
@@ -113,21 +113,29 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
     },
   });
 
-  const districtOptions = taiwanCityDistrictRoads.find(
-    (item: {
-      CityName: string;
-      AreaList: {
+  const watchedCity = form.watch("city");
+  const watchedDistrict = form.watch("district");
+
+  const districtOptions = useMemo(() => {
+    return taiwanCityDistrictRoads.find(
+      (item: {
+        CityName: string;
+        AreaList: {
+          AreaName: string;
+          RoadList: { RoadName: string; RoadEngName: string }[];
+        }[];
+      }) => item.CityName === watchedCity
+    )?.AreaList;
+  }, [watchedCity]);
+
+  const roadOptions = useMemo(() => {
+    return districtOptions?.find(
+      (item: {
         AreaName: string;
         RoadList: { RoadName: string; RoadEngName: string }[];
-      }[];
-    }) => item.CityName === form.watch("city")
-  )?.AreaList;
-  const roadOptions = districtOptions?.find(
-    (item: {
-      AreaName: string;
-      RoadList: { RoadName: string; RoadEngName: string }[];
-    }) => item.AreaName === form.watch("district")
-  )?.RoadList;
+      }) => item.AreaName === watchedDistrict
+    )?.RoadList;
+  }, [districtOptions, watchedDistrict]);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
