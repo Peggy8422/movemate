@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { apiFetch } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
-import taiwanCityDistrictRoads from "@/public/json/taiwan_city_district_road.json";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -89,10 +88,19 @@ const questionNameMap: { [key: string]: string } = {
 const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [taiwanCityDistrictRoads, setTaiwanCityDistrictRoads] = useState<any[]>(
+    []
+  );
   // for birthday date
   const [date, setDate] = useState<Date>();
 
   const router = useRouter();
+
+  useEffect(() => {
+    import("@/public/json/taiwan_city_district_road.json").then((mod) => {
+      setTaiwanCityDistrictRoads(mod.default);
+    });
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     mode: "onChange",
@@ -113,21 +121,26 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
     },
   });
 
-  const districtOptions = taiwanCityDistrictRoads.find(
-    (item: {
-      CityName: string;
-      AreaList: {
+  const districtOptions = useMemo(() => {
+    return taiwanCityDistrictRoads.find(
+      (item: {
+        CityName: string;
+        AreaList: {
+          AreaName: string;
+          RoadList: { RoadName: string; RoadEngName: string }[];
+        }[];
+      }) => item.CityName === form.watch("city")
+    )?.AreaList;
+  }, [taiwanCityDistrictRoads, form.watch("city")]);
+
+  const roadOptions = useMemo(() => {
+    return districtOptions?.find(
+      (item: {
         AreaName: string;
         RoadList: { RoadName: string; RoadEngName: string }[];
-      }[];
-    }) => item.CityName === form.watch("city")
-  )?.AreaList;
-  const roadOptions = districtOptions?.find(
-    (item: {
-      AreaName: string;
-      RoadList: { RoadName: string; RoadEngName: string }[];
-    }) => item.AreaName === form.watch("district")
-  )?.RoadList;
+      }) => item.AreaName === form.watch("district")
+    )?.RoadList;
+  }, [districtOptions, form.watch("district")]);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -353,8 +366,18 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
                                     }
                                   >
                                     <FormControl>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="請選擇縣市" />
+                                      <SelectTrigger
+                                        disabled={
+                                          taiwanCityDistrictRoads.length === 0
+                                        }
+                                      >
+                                        <SelectValue
+                                          placeholder={
+                                            taiwanCityDistrictRoads.length === 0
+                                              ? "載入中..."
+                                              : "請選擇縣市"
+                                          }
+                                        />
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
