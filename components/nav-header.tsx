@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import BrandLogo from "@/public/movemate_logo.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
@@ -29,37 +29,13 @@ import { Separator } from "@/components/ui/separator";
 
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { getCookie, deleteCookie } from "@/app/actions";
+import { deleteCookie } from "@/app/actions";
+import { UserAuth } from "@/types/user";
 
-interface User {
-  id?: string;
-  name: string;
-  email: string;
-  googleId?: string;
-  facebookId?: string;
-  lineId?: string;
-  coverPhoto: string;
-  profilePic: string;
-  isFilledOutDoc: boolean;
-  iat: number;
-  exp: number;
-}
-
-const NavHeader = () => {
-  const [user, setUser] = useState<User | null>(null);
+const NavHeader = ({ user }: { user: UserAuth | null }) => {
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const userData = await getCookie("user");
-      if (userData) {
-        setUser(JSON.parse(userData.value));
-      }
-    };
-    fetchUserData();
-  }, []);
 
   return (
     <div className="brand-header w-full pr-8 pl-3 py-4 flex items-center justify-between absolute top-0 left-0 shadow-md bg-neutral-100 dark:bg-neutral-900 z-40">
