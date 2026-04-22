@@ -56,10 +56,13 @@ const getProfileData = async () => {
   const userBasicInfo = data.profile;
   const userAnswers = data.answers;
 
+  // Convert userAnswers array to a Map for O(1) lookup
+  const answersMap = new Map<string, any>(
+    userAnswers?.map((item: any) => [item.questionTitle, item])
+  );
+
   // calculate age
-  const birthDate = new Date(userAnswers?.find(
-      (item: { questionTitle: string }) => item.questionTitle === "生日"
-    )?.birthDate);
+  const birthDate = new Date(answersMap.get("生日")?.birthDate);
 
   const today = new Date();
   const age = today.getFullYear() - birthDate.getFullYear();
@@ -68,33 +71,17 @@ const getProfileData = async () => {
     userName: userBasicInfo.name,
     userAvatar: userBasicInfo.profilePic || "/default_user_avatar_1.png",
     userCoverPhoto: userBasicInfo.coverPhoto || "/default_user_cover.jpeg",
-    userSexual: userAnswers?.find(
-      (item: { questionTitle: string }) => item.questionTitle === "性別"
-    )?.selections[0].selectionText,
+    userSexual: answersMap.get("性別")?.selections?.[0]?.selectionText,
     userAge: age,
-    userHeight: userAnswers?.find(
-      (item: { questionTitle: string }) => item.questionTitle === "身高"
-    )?.textAnswers,
-    userWeight: userAnswers?.find(
-      (item: { questionTitle: string }) => item.questionTitle === "體重"
-    )?.textAnswers,
-    livingArea: userAnswers
-      ?.find(
-        (item: { questionTitle: string }) => item.questionTitle === "住哪?"
-      )
-      ?.textAnswers[0]?.slice(0, 3),
+    userHeight: answersMap.get("身高")?.textAnswers,
+    userWeight: answersMap.get("體重")?.textAnswers,
+    livingArea: answersMap.get("住哪?")?.textAnswers?.[0]?.slice(0, 3),
     userLevel: "1",
     selfIntroduction: userBasicInfo.intro || "",
     personalTags: userBasicInfo.personalTags || ["新增標籤"],
     preferance: {
-      place: userAnswers?.find(
-        (item: { questionTitle: string }) =>
-          item.questionTitle === "最常在哪裡運動？"
-      ),
-      sportType: userAnswers?.find(
-        (item: { questionTitle: string }) =>
-          item.questionTitle === "喜歡的運動種類？"
-      ),
+      place: answersMap.get("最常在哪裡運動？"),
+      sportType: answersMap.get("喜歡的運動種類？"),
     },
   };
 };
