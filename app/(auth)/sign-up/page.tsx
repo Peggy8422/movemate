@@ -84,10 +84,10 @@ const SignUpForm = () =>
         
         if (typeof result.message === "string") {
           message = result.message;
-        } else {
-          for (const m in result.message) {
-            message += `${m}: ${result.message[m].join(". ")}\n`;
-          }
+        } else if (result.message && typeof result.message === "object") {
+          message = Object.entries(result.message)
+            .map(([key, value]) => `${key}: ${(value as string[]).join(". ")}`)
+            .join("\n");
         }
       } catch (error) {
         console.log(error);
