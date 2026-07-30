@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { apiFetch } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import taiwanCityDistrictRoads from "@/public/json/taiwan_city_district_road.json";
@@ -113,21 +113,37 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
     },
   });
 
-  const districtOptions = taiwanCityDistrictRoads.find(
-    (item: {
-      CityName: string;
-      AreaList: {
+  const city = form.watch("city");
+  const district = form.watch("district");
+
+  const districtOptions = useMemo(() => {
+    return taiwanCityDistrictRoads.find(
+      (item: {
+        CityName: string;
+        AreaList: {
+          AreaName: string;
+          RoadList: { RoadName: string; RoadEngName: string }[];
+        }[];
+      }) => item.CityName === city
+    )?.AreaList;
+  }, [city]);
+
+  const roadOptions = useMemo(() => {
+    return districtOptions?.find(
+      (item: {
         AreaName: string;
         RoadList: { RoadName: string; RoadEngName: string }[];
-      }[];
-    }) => item.CityName === form.watch("city")
-  )?.AreaList;
-  const roadOptions = districtOptions?.find(
-    (item: {
-      AreaName: string;
-      RoadList: { RoadName: string; RoadEngName: string }[];
-    }) => item.AreaName === form.watch("district")
-  )?.RoadList;
+      }) => item.AreaName === district
+    )?.RoadList;
+  }, [districtOptions, district]);
+
+  const basicQuestions = useMemo(() => {
+    return questions?.filter((question: Question) => question.isBasic);
+  }, [questions]);
+
+  const nonBasicQuestions = useMemo(() => {
+    return questions?.filter((question: Question) => !question.isBasic);
+  }, [questions]);
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -198,9 +214,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
           {currentStep === 1 && (
             <div>
               <h1 className="mb-6">Q1: 請填寫個人資料</h1>
-              {questions
-                ?.filter((question: Question) => question.isBasic)
-                .map((question: Question) =>
+              {basicQuestions?.map((question: Question) =>
                   question.title === "性別" ? (
                     <FormField
                       key={question.id}
@@ -323,10 +337,8 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
             </div>
           )}
           {/* map questions: not basic */}
-          {questions
-            ?.filter((question: Question) => !question.isBasic)
-            .map((question: Question, index: number) => {
-              return (
+          {nonBasicQuestions?.map((question: Question, index: number) => {
+            return (
                 currentStep === index + 2 && (
                   <div key={question.id}>
                     <h1 className="mb-6">
