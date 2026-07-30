@@ -18,14 +18,20 @@ export async function GET(req: NextRequest) {
     }
 
     const contentType = res.headers.get('content-type') || 'image/jpeg';
-    const imageBuffer = await res.arrayBuffer();
+    const contentLength = res.headers.get('content-length');
 
-    return new NextResponse(imageBuffer, {
+    const headers: Record<string, string> = {
+      'Content-Type': contentType,
+      'Cache-Control': 'public, max-age=86400',
+    };
+
+    if (contentLength) {
+      headers['Content-Length'] = contentLength;
+    }
+
+    return new NextResponse(res.body, {
       status: 200,
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=86400',
-      },
+      headers,
     });
   } catch (error) {
     return new NextResponse(`Error fetching image: ${(error as Error).message}`, {
