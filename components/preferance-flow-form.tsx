@@ -97,9 +97,11 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
   const router = useRouter();
 
   useEffect(() => {
-    import("@/public/json/taiwan_city_district_road.json").then((mod) => {
-      setTaiwanCityDistrictRoads(mod.default);
-    });
+    fetch("/api/geographic-data")
+      .then((res) => res.json())
+      .then((data) => {
+        setTaiwanCityDistrictRoads(data);
+      });
   }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
