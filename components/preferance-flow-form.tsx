@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { apiFetch } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import taiwanCityDistrictRoads from "@/public/json/taiwan_city_district_road.json";
@@ -49,6 +49,17 @@ import { useForm } from "react-hook-form";
 import { Question } from "@/types/question";
 import { getCookie } from "@/app/actions";
 
+// Pre-compute lookup maps for better performance during form interactions
+const cityMap = new Map<string, (typeof taiwanCityDistrictRoads)[0]["AreaList"]>();
+const districtMap = new Map<string, (typeof taiwanCityDistrictRoads)[0]["AreaList"][0]["RoadList"]>();
+
+taiwanCityDistrictRoads.forEach((city) => {
+  cityMap.set(city.CityName, city.AreaList);
+  city.AreaList.forEach((area) => {
+    districtMap.set(`${city.CityName}-${area.AreaName}`, area.RoadList);
+  });
+});
+
 const formSchema = z
   .object({
     height: z.number().min(1).int().nullable(),
@@ -94,6 +105,11 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
 
   const router = useRouter();
 
+  const sexualDefault = useMemo(
+    () => questions.find((q) => q.title === "性別")?.selections?.[0]?.id,
+    [questions]
+  );
+
   const form = useForm<z.infer<typeof formSchema>>({
     mode: "onChange",
     // shouldUnregister: true,
@@ -101,7 +117,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
     defaultValues: {
       height: null,
       weight: null,
-      sexual: questions.find((q) => q.title === "性別")?.selections[0].id,
+      sexual: sexualDefault,
       birthday: "",
       city: "",
       district: "",
@@ -113,21 +129,23 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
     },
   });
 
-  const districtOptions = taiwanCityDistrictRoads.find(
-    (item: {
-      CityName: string;
-      AreaList: {
-        AreaName: string;
-        RoadList: { RoadName: string; RoadEngName: string }[];
-      }[];
-    }) => item.CityName === form.watch("city")
-  )?.AreaList;
-  const roadOptions = districtOptions?.find(
-    (item: {
-      AreaName: string;
-      RoadList: { RoadName: string; RoadEngName: string }[];
-    }) => item.AreaName === form.watch("district")
-  )?.RoadList;
+  const watchCity = form.watch("city");
+  const watchDistrict = form.watch("district");
+
+  const districtOptions = useMemo(() => cityMap.get(watchCity), [watchCity]);
+  const roadOptions = useMemo(
+    () => districtMap.get(`${watchCity}-${watchDistrict}`),
+    [watchCity, watchDistrict]
+  );
+
+  const basicQuestions = useMemo(
+    () => questions?.filter((question: Question) => question.isBasic),
+    [questions]
+  );
+  const extraQuestions = useMemo(
+    () => questions?.filter((question: Question) => !question.isBasic),
+    [questions]
+  );
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -198,9 +216,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
           {currentStep === 1 && (
             <div>
               <h1 className="mb-6">Q1: 請填寫個人資料</h1>
-              {questions
-                ?.filter((question: Question) => question.isBasic)
-                .map((question: Question) =>
+              {basicQuestions?.map((question: Question) =>
                   question.title === "性別" ? (
                     <FormField
                       key={question.id}
@@ -323,9 +339,7 @@ const PreferanceFlowForm = ({ questions }: { questions: Question[] }) => {
             </div>
           )}
           {/* map questions: not basic */}
-          {questions
-            ?.filter((question: Question) => !question.isBasic)
-            .map((question: Question, index: number) => {
+          {extraQuestions?.map((question: Question, index: number) => {
               return (
                 currentStep === index + 2 && (
                   <div key={question.id}>
