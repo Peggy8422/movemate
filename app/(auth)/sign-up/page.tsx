@@ -84,9 +84,12 @@ const SignUpForm = () =>
         
         if (typeof result.message === "string") {
           message = result.message;
-        } else {
-          for (const m in result.message) {
-            message += `${m}: ${result.message[m].join(". ")}\n`;
+        } else if (result.message && typeof result.message === "object") {
+          const entries = Object.entries(result.message as Record<string, string[]>);
+          if (entries.length > 0) {
+            message += entries
+              .map(([key, value]) => `${key}: ${value.join(". ")}`)
+              .join("\n") + "\n";
           }
         }
       } catch (error) {
